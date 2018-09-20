@@ -1,9 +1,9 @@
 /*
-* Geometry.cpp
-*
-*  Created on: Sep 10, 2018
-*      Author: John Hall
-*/
+ * Geometry.cpp
+ *
+ *  Created on: Sep 10, 2018
+ *      Author: John Hall
+ */
 
 #include "Geometry.h"
 
@@ -17,3 +17,4 @@ Geometry::Geometry() : vao(0), vertexBuffer(0), normalBuffer(0), uvBuffer(0), co
 Geometry::~Geometry() {
 
 }
+

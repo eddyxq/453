@@ -1,9 +1,9 @@
 /*
-* Geometry.h
-*	Class for storing geometry
-*  Created on: Sep 10, 2018
-*      Author: John Hall
-*/
+ * Geometry.h
+ *	Class for storing geometry
+ *  Created on: Sep 10, 2018
+ *      Author: John Hall
+ */
 
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_

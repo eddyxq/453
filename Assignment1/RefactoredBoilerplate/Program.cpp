@@ -1,9 +1,9 @@
 /*
-* Program.cpp
-*
-*  Created on: Sep 10, 2018
-*      Author: John Hall
-*/
+ * Program.cpp
+ *
+ *  Created on: Sep 10, 2018
+ *      Author: John Hall
+ */
 
 #include "Program.h"
 
@@ -11,12 +11,13 @@
 #include <string>
 
 //**Must include glad and GLFW in this order or it breaks**
-#include "glad/glad.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "RenderingEngine.h"
 #include "Scene.h"
 
+//Scene* currentScene;
 Program::Program() {
 	setupWindow();
 }
@@ -32,7 +33,7 @@ void Program::start() {
 	scene = new Scene(renderingEngine);
 
 	//Main render loop
-	while (!glfwWindowShouldClose(window)) {
+	while(!glfwWindowShouldClose(window)) {
 		scene->displayScene();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -65,6 +66,8 @@ void Program::setupWindow() {
 		return;
 	}
 
+
+	glfwSetWindowUserPointer(window, this);
 	//Set the custom function that tracks key presses
 	glfwSetKeyCallback(window, KeyCallback);
 
@@ -103,5 +106,16 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	//Key codes are often prefixed with GLFW_KEY_ and can be found on the GLFW website
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+
+	Program* program = (Program*)glfwGetWindowUserPointer(window);
+
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+	{
+		program->getScene()->changeToTriangleScene();
+	}
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+	{
+		program->getScene()->changeToCircleScene();
 	}
 }

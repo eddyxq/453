@@ -1,9 +1,9 @@
 /*
-* Program.h
-*	Base class of a rendering program. Has a scene to render, a rendering engine and a window to render to.
-*  Created on: Sep 10, 2018
-*  Author: John Hall
-*/
+ * Program.h
+ *	Base class of a rendering program. Has a scene to render, a rendering engine and a window to render to.
+ *  Created on: Sep 10, 2018
+ *  Author: John Hall
+ */
 
 #ifndef PROGRAM_H_
 #define PROGRAM_H_
@@ -28,8 +28,10 @@ public:
 	//Prints system specs to the console
 	void QueryGLVersion();
 
+	Scene* getScene() {return scene;}
+
 private:
-	GLFWwindow * window;
+	GLFWwindow* window;
 	RenderingEngine* renderingEngine;
 	Scene* scene;
 

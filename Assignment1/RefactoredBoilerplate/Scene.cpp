@@ -1,9 +1,9 @@
 /*
-* Scene.cpp
-*
-*  Created on: Sep 10, 2018
-*  Author: John Hall
-*/
+ * Scene.cpp
+ *
+ *  Created on: Sep 10, 2018
+ *  Author: John Hall
+ */
 
 #include "Scene.h"
 
@@ -14,10 +14,24 @@
 #include <glm/gtc/type_ptr.hpp>
 
 //**Must include glad and GLFW in this order or it breaks**
-#include "glad/glad.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 Scene::Scene(RenderingEngine* renderer) : renderer(renderer) {
+	changeToTriangleScene();
+}
+
+Scene::~Scene() {
+
+}
+
+void Scene::displayScene() {
+	renderer->RenderScene(objects);
+}
+
+void Scene::changeToTriangleScene(){
+
+	objects.clear();
 	//Create a single triangle
 	//Additional triangles can be created by pushing groups of three more vertices into the verts vector
 	Geometry triangle;
@@ -43,10 +57,36 @@ Scene::Scene(RenderingEngine* renderer) : renderer(renderer) {
 	objects.push_back(triangle);
 }
 
-Scene::~Scene() {
+void Scene::changeToCircleScene(){
+	objects.clear();
+	//Our circle object
+	Geometry circle;
 
-}
+	//RGB color parameters
+	float r = 1;
+	float g = 0;
+	float b = 0;
 
-void Scene::displayScene() {
-	renderer->RenderScene(objects);
+	int numberOfLineSegments = 100;
+	float du = 2 * 3.14f / numberOfLineSegments;
+	for (float u = 0; u < 6 * 3.14f; u += du)
+	{
+		float xCoord = 0.05 * u * cos(u); //1 is important, change to something else for spiral
+		float yCoord = 0.05 * u * sin(u);
+		float zCoord = 1.0f;
+
+		circle.verts.push_back(glm::vec3(xCoord, yCoord, zCoord));
+		circle.colors.push_back(glm::vec3(r, g, b));
+	
+		//Creates a color gradient from red to green
+		r -= 0.0025;
+		g += 0.0025;
+	}
+	//Renders the line connecting any 2 points drawn
+	circle.drawMode = GL_LINE_STRIP;	
+
+	//Construct VAO and VBOs for the circle
+	RenderingEngine::assignBuffers(circle);
+	RenderingEngine::setBufferData(circle);
+	objects.push_back(circle);
 }

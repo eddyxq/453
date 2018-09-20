@@ -1,9 +1,9 @@
 /*
-* Scene.h
-*	Class for storing objects in a scene
-*  Created on: Sep 10, 2018
-*      Author: cb-ha
-*/
+ * Scene.h
+ *	Class for storing objects in a scene
+ *  Created on: Sep 10, 2018
+ *      Author: cb-ha
+ */
 
 #ifndef SCENE_H_
 #define SCENE_H_
@@ -24,8 +24,11 @@ public:
 	//Send geometry to the renderer
 	void displayScene();
 
+	void changeToTriangleScene();
+	void changeToCircleScene();
+
 private:
-	RenderingEngine * renderer;
+	RenderingEngine* renderer;
 
 	//list of objects in the scene
 	std::vector<Geometry> objects;
