@@ -24,8 +24,11 @@ public:
 	//Send geometry to the renderer
 	void displayScene();
 
-	void changeToTriangleScene();
-	void changeToCircleScene();
+	void displaySquaresAndDiamondsScene();
+	void displayParametricSprialScene(int x);
+	void displayMengerSpongeScene();
+	void displaySierpinskiTriangleReloadedScene();
+	void displayFractalGeometriesScene();
 
 private:
 	RenderingEngine* renderer;

@@ -28,6 +28,9 @@ Program::~Program() {
 	delete scene;
 }
 
+int iteration = 0;
+std::string currentScene = "";
+
 void Program::start() {
 	renderingEngine = new RenderingEngine();
 	scene = new Scene(renderingEngine);
@@ -102,7 +105,10 @@ void ErrorCallback(int error, const char* description) {
 	std::cout << description << std::endl;
 }
 
-void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
+{
+	
+
 	//Key codes are often prefixed with GLFW_KEY_ and can be found on the GLFW website
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
@@ -112,10 +118,37 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
 	{
-		program->getScene()->changeToTriangleScene();
+		currentScene = "SquaresAndDiamonds";
+		program->getScene()->displaySquaresAndDiamondsScene();
 	}
 	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
 	{
-		program->getScene()->changeToCircleScene();
+		currentScene = "ParametricSprial";
+		program->getScene()->displayParametricSprialScene(iteration);
+	}
+	if (key == GLFW_KEY_3 && action == GLFW_PRESS)
+	{
+		currentScene = "MengerSponge";
+		program->getScene()->displayMengerSpongeScene();
+	}
+	if (key == GLFW_KEY_4 && action == GLFW_PRESS)
+	{
+		currentScene = "SierpinskiTriangleReloaded";
+		program->getScene()->displaySierpinskiTriangleReloadedScene();
+	}
+	if (key == GLFW_KEY_5 && action == GLFW_PRESS)
+	{
+		currentScene = "FractalGeometries";
+		program->getScene()->displayFractalGeometriesScene();
+	}
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	{
+		iteration += 2;
+		program->getScene()->displayParametricSprialScene(iteration);
+	}
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	{
+		iteration -= 2;
+		program->getScene()->displayParametricSprialScene(iteration);
 	}
 }
