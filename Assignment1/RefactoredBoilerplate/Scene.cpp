@@ -18,7 +18,7 @@
 #include <GLFW/glfw3.h>
 
 Scene::Scene(RenderingEngine* renderer) : renderer(renderer) {
-	changeToTriangleScene();
+     displaySquaresAndDiamondsScene();
 }
 
 Scene::~Scene() {
