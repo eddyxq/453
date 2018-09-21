@@ -69,7 +69,6 @@ void Program::setupWindow() {
 		return;
 	}
 
-
 	glfwSetWindowUserPointer(window, this);
 	//Set the custom function that tracks key presses
 	glfwSetKeyCallback(window, KeyCallback);
@@ -86,8 +85,6 @@ void Program::setupWindow() {
 	//Query and print out information about our OpenGL environment
 	QueryGLVersion();
 }
-
-
 
 void Program::QueryGLVersion() {
 	// query opengl version and renderer information
@@ -107,8 +104,6 @@ void ErrorCallback(int error, const char* description) {
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
 {
-	
-
 	//Key codes are often prefixed with GLFW_KEY_ and can be found on the GLFW website
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
@@ -118,37 +113,60 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
 	{
+		iteration = 0;
 		currentScene = "SquaresAndDiamonds";
-		program->getScene()->displaySquaresAndDiamondsScene();
+		program->getScene()->displaySquaresAndDiamondsScene(iteration);
 	}
 	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
 	{
+		iteration = 0;
 		currentScene = "ParametricSprial";
 		program->getScene()->displayParametricSprialScene(iteration);
 	}
 	if (key == GLFW_KEY_3 && action == GLFW_PRESS)
 	{
+		iteration = 0;
 		currentScene = "MengerSponge";
-		program->getScene()->displayMengerSpongeScene();
+		program->getScene()->displayMengerSpongeScene(iteration);
 	}
 	if (key == GLFW_KEY_4 && action == GLFW_PRESS)
 	{
+		iteration = 0;
 		currentScene = "SierpinskiTriangleReloaded";
-		program->getScene()->displaySierpinskiTriangleReloadedScene();
+		program->getScene()->displaySierpinskiTriangleReloadedScene(iteration);
 	}
 	if (key == GLFW_KEY_5 && action == GLFW_PRESS)
 	{
+		iteration = 0;
 		currentScene = "FractalGeometries";
-		program->getScene()->displayFractalGeometriesScene();
+		program->getScene()->displayFractalGeometriesScene(iteration);
 	}
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
 	{
-		iteration += 2;
-		program->getScene()->displayParametricSprialScene(iteration);
+		if (currentScene == "SquaresAndDiamonds")
+		{
+			iteration += 1;
+			program->getScene()->displaySquaresAndDiamondsScene(iteration);
+		}
+
+		else if (currentScene == "ParametricSprial")
+		{
+			iteration += 1;
+			program->getScene()->displayParametricSprialScene(iteration);
+		}
 	}
 	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
 	{
-		iteration -= 2;
-		program->getScene()->displayParametricSprialScene(iteration);
+		if (currentScene == "SquaresAndDiamonds")
+		{
+			iteration -= 1;
+			program->getScene()->displaySquaresAndDiamondsScene(iteration);
+		}
+
+		else if (currentScene == "ParametricSprial")
+		{
+			iteration -= 1;
+			program->getScene()->displayParametricSprialScene(iteration);
+		}
 	}
 }

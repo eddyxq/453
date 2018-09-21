@@ -18,7 +18,7 @@
 #include <GLFW/glfw3.h>
 
 Scene::Scene(RenderingEngine* renderer) : renderer(renderer) {
-     displaySquaresAndDiamondsScene();
+     displaySquaresAndDiamondsScene(0);
 }
 
 Scene::~Scene() {
@@ -29,52 +29,85 @@ void Scene::displayScene() {
 	renderer->RenderScene(objects);
 }
 
-void Scene::displaySquaresAndDiamondsScene() {
+void Scene::displaySquaresAndDiamondsScene(int iteration) {
 
 	objects.clear();
 	//Create a single triangle
 	//Additional triangles can be created by pushing groups of three more vertices into the verts vector
-	Geometry triangle;
-	triangle.verts.push_back(glm::vec3(-0.6f, -0.4f, 1.0f));
-	triangle.verts.push_back(glm::vec3(0.0f, 0.6f, 1.0f));
-	triangle.verts.push_back(glm::vec3(0.6f, -0.4f, 1.0f));
+	Geometry square;
 
-	//Colors are stored per vertex in the order of the vertices
-	triangle.colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
-	triangle.colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-	triangle.colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	float postiveBorderValue = 0.9f;
+	float negativeBorderValue = -0.9f;
 
-	triangle.drawMode = GL_TRIANGLES;
+	//float iteration = 6;
+	float scalingFactor = 1;
+	double shadeFactor = 1;
+
+	for (int x = 0; x < iteration; x++) {
+		//squares
+		square.verts.push_back(glm::vec3(-0.9f/scalingFactor, -0.9f/scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(0.9f/scalingFactor, -0.9f/scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(0.9f/scalingFactor, 0.9f/scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(-0.9f/scalingFactor, 0.9f/scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(-0.9f/scalingFactor, -0.9f/scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(-0.9f/scalingFactor, 0.9f/scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(0.9f/scalingFactor, 0.9f/scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(0.9f/scalingFactor, -0.9f/scalingFactor, 1.0f));
+		//diamonds
+		square.verts.push_back(glm::vec3(-0.9f /scalingFactor, 0.0f /scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(0.0f /scalingFactor, -0.9f /scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(0.9f /scalingFactor, 0.0f /scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(0.0f /scalingFactor, 0.9f /scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(-0.9f /scalingFactor, 0.0f /scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(0.0f /scalingFactor, 0.9f /scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(0.0f /scalingFactor, -0.9f /scalingFactor, 1.0f));
+		square.verts.push_back(glm::vec3(0.9f /scalingFactor, 0.0f /scalingFactor, 1.0f));
+
+		scalingFactor *= 2;
+	}
+
+	for (int i = 0; i < iteration; i++) {
+		for (int j = 0; j < 8; j++) {
+			square.colors.push_back(glm::vec3(shadeFactor, 0.0f, 0.0f));
+		}
+
+		for (int k = 0; k < 8; k++) {
+			square.colors.push_back(glm::vec3(0.0f, shadeFactor, 0.0f));
+		}
+		shadeFactor -= 0.2;
+	}
+
+	square.drawMode = GL_LINES;
 
 	//Construct vao and vbos for the triangle
-	RenderingEngine::assignBuffers(triangle);
+	RenderingEngine::assignBuffers(square);
 
 	//Send the triangle data to the GPU
 	//Must be done every time the triangle is modified in any way, ex. verts, colors, normals, uvs, etc.
-	RenderingEngine::setBufferData(triangle);
+	RenderingEngine::setBufferData(square);
 
 	//Add the triangle to the scene objects
-	objects.push_back(triangle);
+	objects.push_back(square);
 }
 
-void Scene::displayParametricSprialScene(int x){
+void Scene::displayParametricSprialScene(int iteration){
 	objects.clear();
 
 	//Our circle object
 	Geometry circle;
 
 	//RGB color parameters
-	float r = 1;
-	float g = 0;
-	float b = 0;
+	double r = 1;
+	double g = 0;
+	double b = 0;
 
 	int numberOfLineSegments = 100;
 	float du = 2 * 3.14f / numberOfLineSegments;
-	for (float u = 0; u < x * 3.14f; u += du)
+	for (float u = 0; u < iteration * 2 * 3.14f; u += du)
 	{
-		float xCoord = 0.038 * u * cos(u); //1 is important, change to something else for spiral
-		float yCoord = 0.038 * u * sin(u);
-		float zCoord = 1.0f;
+		double xCoord = 0.038 * u * cos(u); //1 is important, change to something else for spiral
+		double yCoord = 0.038 * u * sin(u);
+		double zCoord = 1.0f;
 
 		circle.verts.push_back(glm::vec3(xCoord, yCoord, zCoord));
 		circle.colors.push_back(glm::vec3(r, g, b));
@@ -92,14 +125,14 @@ void Scene::displayParametricSprialScene(int x){
 	objects.push_back(circle);
 }
 
-void Scene::displayMengerSpongeScene() {
+void Scene::displayMengerSpongeScene(int iteration) {
 
 }
 
-void Scene::displaySierpinskiTriangleReloadedScene() {
+void Scene::displaySierpinskiTriangleReloadedScene(int iteration) {
 
 }
 
-void Scene::displayFractalGeometriesScene() {
+void Scene::displayFractalGeometriesScene(int iteration) {
 
 }

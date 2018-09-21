@@ -1,6 +1,4 @@
-﻿  Scene.cpp
-c:\users\eddy\documents\github\453\assignment1\refactoredboilerplate\scene.cpp(75): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\eddy\documents\github\453\assignment1\refactoredboilerplate\scene.cpp(76): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\eddy\documents\github\453\assignment1\refactoredboilerplate\scene.cpp(83): warning C4305: '-=': truncation from 'double' to 'float'
-c:\users\eddy\documents\github\453\assignment1\refactoredboilerplate\scene.cpp(84): warning C4305: '+=': truncation from 'double' to 'float'
+﻿  Program.cpp
+  Scene.cpp
+  Generating Code...
   RefactoredBoilerplate.vcxproj -> C:\Users\Eddy\Documents\GitHub\453\Assignment1\Debug\RefactoredBoilerplate.exe
