@@ -26,9 +26,11 @@ public:
 
 	void displaySquaresAndDiamondsScene(int iteration);
 	void displayParametricSprialScene(int iteration);
-	void displayMengerSpongeScene(int iteration);
+	void displaySierpinskiScene(int iteration);
 	void displaySierpinskiTriangleReloadedScene(int iteration);
 	void displayFractalGeometriesScene(int iteration);
+	void drawSierpinski(float x1, float y1, float x2, float y2, float x3, float y3, Geometry triangle, int iteration, float r, float g, float b);
+	void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, int iteration, float r, float g, float b);
 
 private:
 	RenderingEngine* renderer;

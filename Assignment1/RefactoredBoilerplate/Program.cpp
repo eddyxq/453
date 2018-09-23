@@ -126,8 +126,8 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	if (key == GLFW_KEY_3 && action == GLFW_PRESS)
 	{
 		iteration = 0;
-		currentScene = "MengerSponge";
-		program->getScene()->displayMengerSpongeScene(iteration);
+		currentScene = "Sierpinski";
+		program->getScene()->displaySierpinskiScene(iteration);
 	}
 	if (key == GLFW_KEY_4 && action == GLFW_PRESS)
 	{
@@ -154,6 +154,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			iteration += 1;
 			program->getScene()->displayParametricSprialScene(iteration);
 		}
+
+		else if (currentScene == "Sierpinski")
+		{
+			iteration += 1;
+			program->getScene()->displaySierpinskiScene(iteration);
+		}
 	}
 	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
 	{
@@ -167,6 +173,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		{
 			iteration -= 1;
 			program->getScene()->displayParametricSprialScene(iteration);
+		}
+
+		else if (currentScene == "Sierpinski")
+		{
+			iteration -= 1;
+			program->getScene()->displaySierpinskiScene(iteration);
 		}
 	}
 }

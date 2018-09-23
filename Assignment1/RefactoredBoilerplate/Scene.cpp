@@ -105,8 +105,16 @@ void Scene::displayParametricSprialScene(int iteration){
 	objects.push_back(circle);
 }
 
-void Scene::displayMengerSpongeScene(int iteration) {
+void Scene::displaySierpinskiScene(int iteration) {
+	objects.clear();
+	Geometry triangle;
+	float x1 = 0.0f; float y1 = sqrt(pow(0.9, 2) - pow(0.45, 2));
+	float x2 = 0.9f; float y2 = -0.9f;
+	float x3 = -0.9f; float y3 = -0.9f;
 
+	float r = 1.0f; float g = 1.0f; float b = 1.0f;
+
+	drawSierpinski(x1, y1, x2, y2, x3, y3, triangle, iteration, r, g, b);
 }
 
 void Scene::displaySierpinskiTriangleReloadedScene(int iteration) {
@@ -115,4 +123,45 @@ void Scene::displaySierpinskiTriangleReloadedScene(int iteration) {
 
 void Scene::displayFractalGeometriesScene(int iteration) {
 
+}
+
+void Scene::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, int iteration, float r, float g, float b)
+{
+	Geometry triangle;
+
+	triangle.verts.push_back(glm::vec3(x1, y1, 1.0f));
+	triangle.verts.push_back(glm::vec3(x2, y2, 1.0f));
+	triangle.verts.push_back(glm::vec3(x3, y3, 1.0f));
+
+	//Colors are stored per vertex in the order of the vertices
+	triangle.colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+	triangle.colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	triangle.colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+
+	triangle.drawMode = GL_TRIANGLES;
+
+	//Construct vao and vbos for the triangle
+	RenderingEngine::assignBuffers(triangle);
+
+	//Send the triangle data to the GPU
+	//Must be done every time the triangle is modified in any way, ex. verts, colors, normals, uvs, etc.
+	RenderingEngine::setBufferData(triangle);
+
+	//Add the triangle to the scene objects
+	objects.push_back(triangle);
+}
+
+
+void Scene::drawSierpinski(float x1, float y1, float x2, float y2, float x3, float y3, Geometry triangle, int iteration, float r, float g, float b)
+{
+	drawTriangle(x1, y1, x2, y2, x3, y3, iteration, r, g, b);
+	if (iteration > 0)
+	{
+		float ax = (x1 + x2) / 2; float ay = (y1 + y2) / 2;
+		float bx = (x2 + x3) / 2; float by = (y2 + y3) / 2;
+		float cx = (x1 + x3) / 2; float cy = (y1 + y3) / 2;
+		drawSierpinski(x1, y1, ax, ay, cx, cy, triangle, iteration - 1, 1, 0, 0);
+		drawSierpinski(ax, ay, x2, y2, bx, by, triangle, iteration - 1, 0, 1, 0);
+		drawSierpinski(cx, cy, bx, by, x3, y3, triangle, iteration - 1, 0, 0, 1);
+	}
 }
