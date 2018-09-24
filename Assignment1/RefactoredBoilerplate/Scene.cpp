@@ -108,13 +108,28 @@ void Scene::displayParametricSprialScene(int iteration){
 void Scene::displaySierpinskiScene(int iteration) {
 	objects.clear();
 	Geometry triangle;
-	float x1 = 0.0f; float y1 = sqrt(pow(0.9, 2) - pow(0.45, 2));
-	float x2 = 0.9f; float y2 = -0.9f;
-	float x3 = -0.9f; float y3 = -0.9f;
+	//base triangle coordinates
+	double x1 = 0.0f;     double y1 = sqrt(pow(0.9, 2) - pow(0.45, 2));
+	double x2 = 0.45f;    double y2 = (y1-0.9)/2;
+	double x3 = -0.45f;   double y3 = (y1-0.9)/2;
 
-	float r = 1.0f; float g = 1.0f; float b = 1.0f;
+	//top blue triangle
+	double a_x1 = 0.0f;   double a_y1 = sqrt(pow(0.9, 2) - pow(0.45, 2));
+	double a_x2 = 0.45f;  double a_y2 = (y1-0.9)/2;
+	double a_x3 = -0.45f; double a_y3 = (y1-0.9)/2;
+	drawSierpinski(a_x1, a_y1, a_x2, a_y2, a_x3, a_y3, triangle, iteration, 0, 0, 1);
 
-	drawSierpinski(x1, y1, x2, y2, x3, y3, triangle, iteration, r, g, b);
+	//bottom right green triangle
+	double b_x1 = 0.45f;  double b_y1 = (y1-0.9)/2;
+	double b_x2 = 0.9f;   double b_y2 = -0.9f;
+	double b_x3 = 0.0f;   double b_y3 = -0.9f;
+	drawSierpinski(b_x1, b_y1, b_x2, b_y2, b_x3, b_y3, triangle, iteration, 0, 1, 0);
+
+	//bottom left red triangle
+	double c_x1 = -0.45f; double c_y1 = (y1-0.9)/2;
+	double c_x2 = 0.0f;   double c_y2 = -0.9f;
+	double c_x3 = -0.9f;  double c_y3 = -0.9f;
+	drawSierpinski(c_x1, c_y1, c_x2, c_y2, c_x3, c_y3, triangle, iteration, 1, 0, 0);
 }
 
 void Scene::displaySierpinskiTriangleReloadedScene(int iteration) {
@@ -125,7 +140,7 @@ void Scene::displayFractalGeometriesScene(int iteration) {
 
 }
 
-void Scene::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, int iteration, float r, float g, float b)
+void Scene::drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3, int iteration, double r, double g, double b)
 {
 	Geometry triangle;
 
@@ -134,9 +149,9 @@ void Scene::drawTriangle(float x1, float y1, float x2, float y2, float x3, float
 	triangle.verts.push_back(glm::vec3(x3, y3, 1.0f));
 
 	//Colors are stored per vertex in the order of the vertices
-	triangle.colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
-	triangle.colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-	triangle.colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	triangle.colors.push_back(glm::vec3(r, g, b));
+	triangle.colors.push_back(glm::vec3(r, g, b));
+	triangle.colors.push_back(glm::vec3(r, g, b));
 
 	triangle.drawMode = GL_TRIANGLES;
 
@@ -151,17 +166,19 @@ void Scene::drawTriangle(float x1, float y1, float x2, float y2, float x3, float
 	objects.push_back(triangle);
 }
 
-
-void Scene::drawSierpinski(float x1, float y1, float x2, float y2, float x3, float y3, Geometry triangle, int iteration, float r, float g, float b)
+void Scene::drawSierpinski(double x1, double y1, double x2, double y2, double x3, double y3, Geometry triangle, int iteration, double r, double g, double b)
 {
 	drawTriangle(x1, y1, x2, y2, x3, y3, iteration, r, g, b);
 	if (iteration > 0)
 	{
-		float ax = (x1 + x2) / 2; float ay = (y1 + y2) / 2;
-		float bx = (x2 + x3) / 2; float by = (y2 + y3) / 2;
-		float cx = (x1 + x3) / 2; float cy = (y1 + y3) / 2;
-		drawSierpinski(x1, y1, ax, ay, cx, cy, triangle, iteration - 1, 1, 0, 0);
-		drawSierpinski(ax, ay, x2, y2, bx, by, triangle, iteration - 1, 0, 1, 0);
-		drawSierpinski(cx, cy, bx, by, x3, y3, triangle, iteration - 1, 0, 0, 1);
+		double ax = (x1 + x2) / 2; double ay = (y1 + y2) / 2;
+		double bx = (x2 + x3) / 2; double by = (y2 + y3) / 2;
+		double cx = (x1 + x3) / 2; double cy = (y1 + y3) / 2;
+		r -= 0.05; g -= 0.05; b -= 0.05;
+		drawSierpinski(x1, y1, ax, ay, cx, cy, triangle, iteration - 1, r, g, b); 
+		r -= 0.05; g -= 0.05; b -= 0.05;
+		drawSierpinski(ax, ay, x2, y2, bx, by, triangle, iteration - 1, r, g, b); 
+		r -= 0.05; g -= 0.05; b -= 0.05;
+		drawSierpinski(cx, cy, bx, by, x3, y3, triangle, iteration - 1, r, g, b); 
 	}
 }

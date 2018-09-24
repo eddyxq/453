@@ -29,8 +29,8 @@ public:
 	void displaySierpinskiScene(int iteration);
 	void displaySierpinskiTriangleReloadedScene(int iteration);
 	void displayFractalGeometriesScene(int iteration);
-	void drawSierpinski(float x1, float y1, float x2, float y2, float x3, float y3, Geometry triangle, int iteration, float r, float g, float b);
-	void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, int iteration, float r, float g, float b);
+	void drawSierpinski(double x1, double y1, double x2, double y2, double x3, double y3, Geometry triangle, int iteration, double r, double g, double b);
+	void drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3, int iteration, double r, double g, double b);
 
 private:
 	RenderingEngine* renderer;

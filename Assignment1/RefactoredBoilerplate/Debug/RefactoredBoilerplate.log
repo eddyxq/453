@@ -1,3 +1,2 @@
 ﻿  Scene.cpp
-c:\users\eddy\documents\github\453\assignment1\refactoredboilerplate\scene.cpp(111): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   RefactoredBoilerplate.vcxproj -> C:\Users\Eddy\Documents\GitHub\453\Assignment1\Debug\RefactoredBoilerplate.exe
