@@ -88,14 +88,14 @@ void Scene::displayParametricSprialScene(int iteration){
 	float du = 2 * 3.14f / numberOfLineSegments;
 	//Create spirals
 	for (float u = 0; u < iteration * 2 * 3.14f; u += du) {
-		double xCoord = 0.038 * u * cos(u); 
-		double yCoord = 0.038 * u * sin(u);
+		double xCoord = 0.14/iteration * u * cos(u); 
+		double yCoord = 0.14/iteration * u * sin(u);
 		double zCoord = 1.0f;
 		circle.verts.push_back(glm::vec3(xCoord, yCoord, zCoord));
 		circle.colors.push_back(glm::vec3(r, g, b));
 		//Creates a color gradient from red to green
-		r -= 0.0015;
-		g += 0.0015;
+		r -= 0.0012;
+		g += 0.0012;
 	}
 	//Set draw mode
 	circle.drawMode = GL_LINE_STRIP;	
