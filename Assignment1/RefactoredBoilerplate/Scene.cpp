@@ -94,34 +94,18 @@ void Scene::displaySierpinskiScene(int iteration) {
 	objects.clear();
 	Geometry triangle;
 	//base triangle coordinates
-	double x1 = 0.0f;     double y1 = sqrt(pow(0.9, 2) - pow(0.45, 2));
-	double x2 = 0.45f;    double y2 = (y1-0.9)/2;
-	double x3 = -0.45f;   double y3 = (y1-0.9)/2;
-
-	//top blue triangle
-	double a_x1 = 0.0f;   double a_y1 = sqrt(pow(0.9, 2) - pow(0.45, 2));
-	double a_x2 = 0.45f;  double a_y2 = (y1-0.9)/2;
-	double a_x3 = -0.45f; double a_y3 = (y1-0.9)/2;
-	drawSierpinski(a_x1, a_y1, a_x2, a_y2, a_x3, a_y3, triangle, iteration, 0, 0, 1);
-
-	//bottom right green triangle
-	double b_x1 = 0.45f;  double b_y1 = (y1-0.9)/2;
-	double b_x2 = 0.9f;   double b_y2 = -0.9f;
-	double b_x3 = 0.0f;   double b_y3 = -0.9f;
-	drawSierpinski(b_x1, b_y1, b_x2, b_y2, b_x3, b_y3, triangle, iteration, 0, 1, 0);
-
-	//bottom left red triangle
-	double c_x1 = -0.45f; double c_y1 = (y1-0.9)/2;
-	double c_x2 = 0.0f;   double c_y2 = -0.9f;
-	double c_x3 = -0.9f;  double c_y3 = -0.9f;
-	drawSierpinski(c_x1, c_y1, c_x2, c_y2, c_x3, c_y3, triangle, iteration, 1, 0, 0);
+	double x1 = 0.0f;    double y1 = sqrt(pow(0.9, 2) - pow(0.45, 2));
+	double x2 = 0.9f;    double y2 = -0.9f;
+	double x3 = -0.9f;   double y3 = -0.9f;
+	drawSierpinski(x1, y1, x2, y2, x3, y3, triangle, iteration, 1, 1, 1);
 }
 
 void Scene::displaySierpinskiTriangleReloadedScene(int iteration) {
 	objects.clear();
 	Geometry point;
 	double x_initial = -0.9; double y_initial = -0.9;
-	for (int i = 0; i < iteration; i++)
+	//plots 200 dots per iteration increase
+	for (int i = 0; i < iteration * 200; i++)
 	{
 		double x_chosen; double y_chosen;
 		//chooses any one of the three vertices based on the random number generated

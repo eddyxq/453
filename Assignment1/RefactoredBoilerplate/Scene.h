@@ -13,7 +13,6 @@ public:
 
 	//Send geometry to the renderer
 	void displayScene();
-
 	void displaySquaresAndDiamondsScene(int iteration);
 	void displayParametricSpiralScene(int iteration);
 	void displaySierpinskiScene(int iteration);

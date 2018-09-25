@@ -143,7 +143,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			program->getScene()->displaySierpinskiScene(iteration);
 		}
 		else if (currentScene == "SierpinskiTriangleReloaded"){
-			iteration += 50;
+			iteration += 1;
 			program->getScene()->displaySierpinskiTriangleReloadedScene(iteration);
 		}
 	}
@@ -162,7 +162,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			program->getScene()->displaySierpinskiScene(iteration);
 		}
 		else if (currentScene == "SierpinskiTriangleReloaded"){
-			iteration -= 50;
+			iteration -= 1;
 			program->getScene()->displaySierpinskiTriangleReloadedScene(iteration);
 		}
 	}
