@@ -1,19 +1,8 @@
-/*
- * Program.cpp
- *
- *  Created on: Sep 10, 2018
- *      Author: John Hall
- */
-
 #include "Program.h"
-
 #include <iostream>
 #include <string>
-
-//**Must include glad and GLFW in this order or it breaks**
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include "RenderingEngine.h"
 #include "Scene.h"
 
@@ -104,81 +93,77 @@ void ErrorCallback(int error, const char* description) {
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
 {
-	//Key codes are often prefixed with GLFW_KEY_ and can be found on the GLFW website
+	//esc closes the program
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
-
 	Program* program = (Program*)glfwGetWindowUserPointer(window);
-
-	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
-	{
+	//press 1 to display part 1 - Squares and Diamonds
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS){
 		iteration = 0;
 		currentScene = "SquaresAndDiamonds";
 		program->getScene()->displaySquaresAndDiamondsScene(iteration);
 	}
-	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
-	{
+	//press 2 to display part 2 - Parametric Spiral
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS){
 		iteration = 0;
-		currentScene = "ParametricSprial";
-		program->getScene()->displayParametricSprialScene(iteration);
+		currentScene = "ParametricSpiral";
+		program->getScene()->displayParametricSpiralScene(iteration);
 	}
-	if (key == GLFW_KEY_3 && action == GLFW_PRESS)
-	{
+	//press 3 to display part 3 - Sierpinski Triangles
+	if (key == GLFW_KEY_3 && action == GLFW_PRESS){
 		iteration = 0;
 		currentScene = "Sierpinski";
 		program->getScene()->displaySierpinskiScene(iteration);
 	}
-	if (key == GLFW_KEY_4 && action == GLFW_PRESS)
-	{
+	//press 4 to display part 4 - Sierpinski Reloaded
+	if (key == GLFW_KEY_4 && action == GLFW_PRESS){
 		iteration = 0;
 		currentScene = "SierpinskiTriangleReloaded";
 		program->getScene()->displaySierpinskiTriangleReloadedScene(iteration);
 	}
-	if (key == GLFW_KEY_5 && action == GLFW_PRESS)
-	{
+	//press 5 to display part 5 - bonus component
+	if (key == GLFW_KEY_5 && action == GLFW_PRESS){
 		iteration = 0;
 		currentScene = "FractalGeometries";
 		program->getScene()->displayFractalGeometriesScene(iteration);
 	}
-	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
-	{
-		if (currentScene == "SquaresAndDiamonds")
-		{
+	//press up arrow to increase iteration level
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS){
+		if (currentScene == "SquaresAndDiamonds"){
 			iteration += 1;
 			program->getScene()->displaySquaresAndDiamondsScene(iteration);
 		}
-
-		else if (currentScene == "ParametricSprial")
-		{
+		else if (currentScene == "ParametricSpiral"){
 			iteration += 1;
-			program->getScene()->displayParametricSprialScene(iteration);
+			program->getScene()->displayParametricSpiralScene(iteration);
 		}
-
-		else if (currentScene == "Sierpinski")
-		{
+		else if (currentScene == "Sierpinski"){
 			iteration += 1;
 			program->getScene()->displaySierpinskiScene(iteration);
+		}
+		else if (currentScene == "SierpinskiTriangleReloaded"){
+			iteration += 50;
+			program->getScene()->displaySierpinskiTriangleReloadedScene(iteration);
 		}
 	}
-	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
-	{
-		if (currentScene == "SquaresAndDiamonds")
-		{
+	//press down arrow to decrease iteration level
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS){
+		if (currentScene == "SquaresAndDiamonds"){
 			iteration -= 1;
 			program->getScene()->displaySquaresAndDiamondsScene(iteration);
 		}
-
-		else if (currentScene == "ParametricSprial")
-		{
+		else if (currentScene == "ParametricSpiral"){
 			iteration -= 1;
-			program->getScene()->displayParametricSprialScene(iteration);
+			program->getScene()->displayParametricSpiralScene(iteration);
 		}
-
-		else if (currentScene == "Sierpinski")
-		{
+		else if (currentScene == "Sierpinski"){
 			iteration -= 1;
 			program->getScene()->displaySierpinskiScene(iteration);
+		}
+		else if (currentScene == "SierpinskiTriangleReloaded"){
+			iteration -= 50;
+			program->getScene()->displaySierpinskiTriangleReloadedScene(iteration);
 		}
 	}
 }

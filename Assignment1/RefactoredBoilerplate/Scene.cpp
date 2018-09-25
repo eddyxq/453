@@ -1,17 +1,8 @@
-/*
- * This class contains the scenes
- * @author Eddy Qiang - CPSC 453 - Tutorial T01
- * @version 1.2 
- * @since September 20, 2018
- */
-
 #include "Scene.h"
 #include "RenderingEngine.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-//**Must include glad and GLFW in this order or it breaks**
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -67,17 +58,13 @@ void Scene::displaySquaresAndDiamondsScene(int iteration) {
 		//Adjust shade factore to create gradient
 		shadeFactor -= 0.2;
 	}
-	//Set draw mode
 	square.drawMode = GL_LINES;
-	//Construct vao and vbos 
 	RenderingEngine::assignBuffers(square);
-	//Send square data to the GPU
 	RenderingEngine::setBufferData(square);
-	//Add sqaure to scene objects
 	objects.push_back(square);
 }
 
-void Scene::displayParametricSprialScene(int iteration){
+void Scene::displayParametricSpiralScene(int iteration){
 	objects.clear();
 	Geometry circle;
 	//RGB color parameters
@@ -97,9 +84,7 @@ void Scene::displayParametricSprialScene(int iteration){
 		r -= 0.0012;
 		g += 0.0012;
 	}
-	//Set draw mode
 	circle.drawMode = GL_LINE_STRIP;	
-	//Construct VAO and VBOs 
 	RenderingEngine::assignBuffers(circle);
 	RenderingEngine::setBufferData(circle);
 	objects.push_back(circle);
@@ -133,36 +118,56 @@ void Scene::displaySierpinskiScene(int iteration) {
 }
 
 void Scene::displaySierpinskiTriangleReloadedScene(int iteration) {
-
+	objects.clear();
+	Geometry point;
+	double x_initial = -0.9; double y_initial = -0.9;
+	for (int i = 0; i < iteration; i++)
+	{
+		double x_chosen; double y_chosen;
+		//chooses any one of the three vertices based on the random number generated
+		int num = rand()%3;
+		if (num == 0){
+			x_chosen = 0.0;
+			y_chosen = sqrt(pow(0.9, 2) - pow(0.45, 2));
+		}
+		else if (num == 1){
+			x_chosen = -0.9;
+			y_chosen = -0.9;
+		}
+		else if (num == 2){
+			x_chosen = 0.9;
+			y_chosen = -0.9;
+		}
+		//calculates mid point between the initial and chosen point
+		double x_midpoint = (x_initial + x_chosen) / 2;
+		double y_midpoint = (y_initial + y_chosen) / 2;
+		//plots the point
+		drawPoint(x_midpoint, y_midpoint, point);
+		//takes the midpoint as the new position and repeats again until loop is finished
+		x_initial = x_midpoint;
+		y_initial = y_midpoint;
+	}
 }
 
 void Scene::displayFractalGeometriesScene(int iteration) {
-
+	//bonus not implemented
 }
 
 void Scene::drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3, int iteration, double r, double g, double b)
 {
 	Geometry triangle;
-
+	//pushes the vertices
 	triangle.verts.push_back(glm::vec3(x1, y1, 1.0f));
 	triangle.verts.push_back(glm::vec3(x2, y2, 1.0f));
 	triangle.verts.push_back(glm::vec3(x3, y3, 1.0f));
-
-	//Colors are stored per vertex in the order of the vertices
+	//pushes the colors
 	triangle.colors.push_back(glm::vec3(r, g, b));
 	triangle.colors.push_back(glm::vec3(r, g, b));
 	triangle.colors.push_back(glm::vec3(r, g, b));
 
 	triangle.drawMode = GL_TRIANGLES;
-
-	//Construct vao and vbos for the triangle
 	RenderingEngine::assignBuffers(triangle);
-
-	//Send the triangle data to the GPU
-	//Must be done every time the triangle is modified in any way, ex. verts, colors, normals, uvs, etc.
 	RenderingEngine::setBufferData(triangle);
-
-	//Add the triangle to the scene objects
 	objects.push_back(triangle);
 }
 
@@ -181,4 +186,19 @@ void Scene::drawSierpinski(double x1, double y1, double x2, double y2, double x3
 		r -= 0.05; g -= 0.05; b -= 0.05;
 		drawSierpinski(cx, cy, bx, by, x3, y3, triangle, iteration - 1, r, g, b); 
 	}
+}
+
+void Scene::drawPoint(double x1, double y1, Geometry point) {
+	//push point coordinates
+	point.verts.push_back(glm::vec3(x1, y1, 0.0f));
+	//set point color to white
+	point.colors.push_back(glm::vec3(1, 1, 1));
+	//set draw mode
+	point.drawMode = GL_POINTS;
+	//Construct vao and vbos for the point
+	RenderingEngine::assignBuffers(point);
+	//Send point data to the GPU
+	RenderingEngine::setBufferData(point);
+	//Add point to the scene objects
+	objects.push_back(point);
 }
