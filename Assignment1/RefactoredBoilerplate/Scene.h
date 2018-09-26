@@ -25,6 +25,9 @@ public:
 	void drawSierpinski(double x1, double y1, double x2, double y2, double x3, double y3, Geometry triangle, int iteration, double r, double g, double b);
 	void drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3, int iteration, double r, double g, double b);
 	void drawPoint(double x1, double y1, Geometry point);
+	void displayHB(int level, float Px, float Py, float Xx, float Xy, float Yx, float Yy);
+	void displayHB2(int level, PTR p0, PTR p1);
+	void displayFractalGeometriesScene2(int iteration);
 	
 private:
 	RenderingEngine* renderer;

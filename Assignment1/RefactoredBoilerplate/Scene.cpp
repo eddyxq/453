@@ -6,6 +6,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+PTR S0;
+bool firstrun = 1;
+
 Scene::Scene(RenderingEngine* renderer) : renderer(renderer) {
      displaySquaresAndDiamondsScene(0);
 }
@@ -228,4 +231,87 @@ void Scene::drawPoint(double x1, double y1, Geometry point) {
 	RenderingEngine::assignBuffers(point);
 	RenderingEngine::setBufferData(point);
 	objects.push_back(point);
+}
+
+void Scene::displayHB(int level, float Px, float Py, float Xx, float Xy, float Yx, float Yy) {
+	PTR Pnew;
+
+	if (level <= 0) {                  //recursive until level reaches zero, then start printing 
+		Pnew.x = Px + (Xx + Yx) / 2;   //calculate new x value 
+		Pnew.y = Py + (Xy + Yy) / 2;   //calculate new y value
+
+		displayHB2(level, S0, Pnew);   //draw line between last calculated and newly calculated points.
+		S0 = Pnew;					   // move new to one for next line print
+	}
+	else {
+		displayHB(level - 1, Px, Py, Yx / 2, Yy / 2, Xx / 2, Xy / 2);
+		displayHB(level - 1, Px + Xx / 2, Py + Xy / 2, Xx / 2, Xy / 2, Yx / 2, Yy / 2);
+		displayHB(level - 1, Px + Xx / 2 + Yx / 2, Py + Xy / 2 + Yy / 2, Xx / 2, Xy / 2, Yx / 2, Yy / 2);
+		displayHB(level - 1, Px + Xx / 2 + Yx, Py + Xy / 2 + Yy, -Yx / 2, -Yy / 2, -Xx / 2, -Xy / 2);
+	}
+}
+
+void Scene::displayHB2(int level, PTR p0, PTR p1) {
+	Geometry line;
+
+	if (firstrun == true) {    // only print when we have the first and second calculated points
+		firstrun = false;
+		return;
+	}
+	line.verts.push_back(glm::vec3(p0.x, p0.y, 1.0f)); //check
+	line.verts.push_back(glm::vec3(p1.x, p1.y, 1.0f));
+
+	if (level == 6)
+		line.colors.push_back(glm::vec3(1.0f, 1.0f, 0.0f));
+	else if (level == 5)
+		line.colors.push_back(glm::vec3(1.0f, 0.0f, 1.0f));
+	else if (level == 4)
+		line.colors.push_back(glm::vec3(0.0f, 1.0f, 1.0f));
+	else if (level == 3)
+		line.colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+	else if (level == 2)
+		line.colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	else
+		line.colors.push_back(glm::vec3(1.0f, 0.5f, 0.0f));
+
+	line.drawMode = GL_LINES;
+
+	//Construct vao and vbos for the triangle
+	RenderingEngine::assignBuffers(line);
+
+	//Send the triangle data to the GPU
+	//Must be done every time the triangle is modified in any way, ex. verts, colors, normals, uvs, etc.
+	RenderingEngine::setBufferData(line);
+
+	//Add the triangle to the scene objects
+	objects.push_back(line);
+}
+
+void Scene::displayFractalGeometriesScene2(int iteration) {
+	objects.clear();
+	firstrun = true;
+	float Px = -1.0f;   
+	float Py = -1.0f;
+	float Xx = 1.0f;     
+	float Xy = 0.0f;
+	float Yx = 0.0f;    
+	float Yy = 1.0f;
+	S0.x = Px;           
+	S0.y = Py;
+	PTR Pnew;
+	if (iteration <= 0) {                 
+		//calculate new x and y value
+		Pnew.x = Px + (Xx + Yx) / 2;       
+		Pnew.y = Py + (Xy + Yy) / 2;       
+		//draw line between last calculated and newly calculated points
+		displayHB2(iteration, S0, Pnew);   
+		// move new to one for next line print
+		S0 = Pnew;					       
+	}
+	else {
+		displayHB(iteration - 1, Px, Py, Yx / 2, Yy / 2, Xx / 2, Xy / 2);
+		displayHB(iteration - 1, Px + Xx / 2, Py + Xy / 2, Xx / 2, Xy / 2, Yx / 2, Yy / 2);
+		displayHB(iteration - 1, Px + Xx / 2 + Yx / 2, Py + Xy / 2 + Yy / 2, Xx / 2, Xy / 2, Yx / 2, Yy / 2);
+		displayHB(iteration - 1, Px + Xx / 2 + Yx, Py + Xy / 2 + Yy, -Yx / 2, -Yy / 2, -Xx / 2, -Xy / 2);
+	}
 }

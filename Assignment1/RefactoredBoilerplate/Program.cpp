@@ -128,6 +128,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		currentScene = "FractalGeometries";
 		program->getScene()->displayFractalGeometriesScene(iteration);
 	}
+	//press 6 to display part 6 - Hilberts Curve
+	if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
+		iteration = 0;
+		currentScene = "FractalGeometries2";
+		program->getScene()->displayFractalGeometriesScene(iteration);
+	}
 	//press up arrow to increase iteration level
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS){
 		if (currentScene == "SquaresAndDiamonds"){
@@ -149,6 +155,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		else if (currentScene == "FractalGeometries") {
 			iteration += 1;
 			program->getScene()->displayFractalGeometriesScene(iteration);
+		}
+		else if (currentScene == "FractalGeometries2") {
+			iteration += 1;
+			program->getScene()->displayFractalGeometriesScene2(iteration);
 		}
 	}
 	//press down arrow to decrease iteration level
@@ -172,6 +182,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		else if (currentScene == "FractalGeometries") {
 			iteration -= 1;
 			program->getScene()->displayFractalGeometriesScene(iteration);
+		}
+		else if (currentScene == "FractalGeometries2") {
+			iteration -= 1;
+			program->getScene()->displayFractalGeometriesScene2(iteration);
 		}
 	}
 }
