@@ -122,7 +122,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		currentScene = "SierpinskiTriangleReloaded";
 		program->getScene()->displaySierpinskiTriangleReloadedScene(iteration);
 	}
-	//press 5 to display part 5 - bonus component
+	//press 5 to display part 5 - Barnsley Fern
 	if (key == GLFW_KEY_5 && action == GLFW_PRESS){
 		iteration = 0;
 		currentScene = "FractalGeometries";
@@ -146,6 +146,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 			iteration += 1;
 			program->getScene()->displaySierpinskiTriangleReloadedScene(iteration);
 		}
+		else if (currentScene == "FractalGeometries") {
+			iteration += 1;
+			program->getScene()->displayFractalGeometriesScene(iteration);
+		}
 	}
 	//press down arrow to decrease iteration level
 	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS){
@@ -164,6 +168,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		else if (currentScene == "SierpinskiTriangleReloaded"){
 			iteration -= 1;
 			program->getScene()->displaySierpinskiTriangleReloadedScene(iteration);
+		}
+		else if (currentScene == "FractalGeometries") {
+			iteration -= 1;
+			program->getScene()->displayFractalGeometriesScene(iteration);
 		}
 	}
 }

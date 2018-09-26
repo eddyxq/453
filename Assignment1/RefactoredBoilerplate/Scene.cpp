@@ -134,21 +134,67 @@ void Scene::displaySierpinskiTriangleReloadedScene(int iteration) {
 }
 
 void Scene::displayFractalGeometriesScene(int iteration) {
-	//bonus not implemented
+	objects.clear();
+	PTR p;
+	iteration *= 1000;
+	p.x = 0.0f;
+	p.y = 0.0f;	
+	for (int i = 0; i < iteration; i++) {
+
+		// Barnsley's FERN is based on 4 different functions corresponding different frequency of probability
+		// Therefore, we use PBB of 100%, first function with 2%, next is 84% with offset 2%,  remaining are 7% each.
+		double PBB = (100 * (double)rand() / RAND_MAX);
+		//Probability of 2 %, less than 2 out 100
+		if (PBB <= 2) {		  
+			p.x = 0;
+			p.y = 0.16*p.y;
+		}
+		// Probability of 84%, wth 2 % offset above.
+		else if (PBB <= 86) { 
+			p.x = 0.85*p.x + 0.04*p.y;
+			p.y = -0.04*p.x + 0.85*p.y + 1.6;
+		}
+		// Probability of 7%, with 86% offset above.
+		else if (PBB <= 93) {   
+			p.x = 0.2*p.x - 0.26*p.y;
+			p.y = 0.23*p.x + 0.22*p.y + 1.6;
+		}
+		// remaining probability of 7%
+		else {					
+			p.x = -0.15*p.x + 0.28*p.y;
+			p.y = 0.26*p.x + 0.24*p.y + 0.44;
+		}
+		Geometry point;
+		double px, py;
+
+		// The FERN is of the size of 10 unit width, and 10 unit height, there we need to scale it to our box of -1 to 1
+		// A 10:2 ratio results in 0.2, and let's make it to 0.19 so it does not touch the border of the window.
+		px = 0.19*p.x;
+		py = 0.19*p.y - 1;
+
+		point.verts.push_back(glm::vec3(px, py, 1.0f)); 
+		//makes the fern green
+		point.colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+
+		point.drawMode = GL_POINTS;
+		RenderingEngine::assignBuffers(point);
+		RenderingEngine::setBufferData(point);
+		objects.push_back(point);
+	}
 }
 
 void Scene::drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3, int iteration, double r, double g, double b)
 {
 	Geometry triangle;
-	//pushes the vertices
+	//draws the lines
 	triangle.verts.push_back(glm::vec3(x1, y1, 1.0f));
 	triangle.verts.push_back(glm::vec3(x2, y2, 1.0f));
 	triangle.verts.push_back(glm::vec3(x3, y3, 1.0f));
-	//pushes the colors
+	//sets the colors
 	triangle.colors.push_back(glm::vec3(r, g, b));
 	triangle.colors.push_back(glm::vec3(r, g, b));
 	triangle.colors.push_back(glm::vec3(r, g, b));
-
+	//render triangle
 	triangle.drawMode = GL_TRIANGLES;
 	RenderingEngine::assignBuffers(triangle);
 	RenderingEngine::setBufferData(triangle);
@@ -163,6 +209,7 @@ void Scene::drawSierpinski(double x1, double y1, double x2, double y2, double x3
 		double ax = (x1 + x2) / 2; double ay = (y1 + y2) / 2;
 		double bx = (x2 + x3) / 2; double by = (y2 + y3) / 2;
 		double cx = (x1 + x3) / 2; double cy = (y1 + y3) / 2;
+		//creates a gradient to distinguish each triangle
 		r -= 0.05; g -= 0.05; b -= 0.05;
 		drawSierpinski(x1, y1, ax, ay, cx, cy, triangle, iteration - 1, r, g, b); 
 		r -= 0.05; g -= 0.05; b -= 0.05;
@@ -173,16 +220,12 @@ void Scene::drawSierpinski(double x1, double y1, double x2, double y2, double x3
 }
 
 void Scene::drawPoint(double x1, double y1, Geometry point) {
-	//push point coordinates
+	//draws points at these coordinates
 	point.verts.push_back(glm::vec3(x1, y1, 0.0f));
-	//set point color to white
+	//sets point color to white
 	point.colors.push_back(glm::vec3(1, 1, 1));
-	//set draw mode
 	point.drawMode = GL_POINTS;
-	//Construct vao and vbos for the point
 	RenderingEngine::assignBuffers(point);
-	//Send point data to the GPU
 	RenderingEngine::setBufferData(point);
-	//Add point to the scene objects
 	objects.push_back(point);
 }
