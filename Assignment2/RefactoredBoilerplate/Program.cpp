@@ -104,4 +104,14 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
+	Program* program = (Program*)glfwGetWindowUserPointer(window);
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+		program->getScene()->switchScene(1);
+	}
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+		program->getScene()->switchScene(2);
+	}
+	if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
+		program->getScene()->switchScene(3);
+	}
 }

@@ -6,6 +6,8 @@
 // ==========================================================================
 #version 410
 
+// uniform float[9] filterKernel;
+
 // location indices for these attributes correspond to those specified in the
 // InitializeGeometry() function of the main program
 layout(location = 0) in vec3 VertexPosition;

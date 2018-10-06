@@ -89,7 +89,7 @@ GLuint ShaderTools::LinkProgram(GLuint vertexShader, GLuint fragmentShader) {
 GLuint ShaderTools::InitializeShaders() {
 	// load shader source from files
 	std::string vertexSource = LoadSource("../shaders/vertex.glsl");
-	std::string fragmentSource = LoadSource("../shaders/fragment.glsl");
+	std::string fragmentSource = LoadSource("../shaders/square_filter_kernel.glsl");
 	if (vertexSource.empty() || fragmentSource.empty()) return false;
 
 	// compile shader source into shader objects

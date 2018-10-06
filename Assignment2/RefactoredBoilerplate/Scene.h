@@ -24,6 +24,8 @@ public:
 	//Send geometry to the renderer
 	void displayScene();
 
+	void switchScene(int idx);
+
 private:
 	RenderingEngine* renderer;
 
@@ -31,6 +33,28 @@ private:
 
 	//list of objects in the scene
 	std::vector<Geometry> objects;
+
+	const GLfloat identity[1] = { 1.0f };
+
+	const GLfloat vertical_sobel[9] = {
+		-1.0f, 0.0f, 1.0f,
+		-2.0f, 0.0f, 2.0f,
+		-1.0f, 0.0f, 1.0f,
+	};
+
+	const GLfloat horizontal_sobel[9] = {
+		-1.0f, -2.0f, -1.0f,
+		0.0f, 0.0f, 0.0f,
+		1.0f, 2.0f, 1.0f,
+	};
+
+	const GLfloat unsharpen_mask[9] = {
+		0.0f, -1.0f, 0.0f,
+		-1.0f, 5.0f, -1.0f,
+		0.0f, -1.0f, 0.0f,
+	};
+
+	std::vector<GLfloat> gaussian1D(int n);
 };
 
 #endif /* SCENE_H_ */
