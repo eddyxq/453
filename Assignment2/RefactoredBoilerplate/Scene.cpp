@@ -33,59 +33,118 @@ Scene::~Scene() {
 }
 
 void Scene::displayScene() {
-	objects.clear();
-	//Load texture uniform
-	//Shaders need to be active to load uniforms
+	//objects.clear();
+	////Load texture uniform
+	////Shaders need to be active to load uniforms
+	//glUseProgram(renderer->shaderProgram);
+	////Set which texture unit the texture is bound to
+	//glActiveTexture(GL_TEXTURE1);
+	////Bind the texture to GL_TEXTURE0
+	//glBindTexture(GL_TEXTURE_RECTANGLE, fgTexture.textureID);
+	////Get identifier for uniform
+	//GLuint uniformLocation = glGetUniformLocation(renderer->shaderProgram, "imageTexture");
+
+	////Load texture unit number into uniform
+	//glUniform1i(uniformLocation, 1);
+
+	//std::vector<GLfloat> gaussian5 = gaussian1D(7);
+	//GLfloat filter[49];
+	//for (int i = 0; i < 7; i++) for (int j = 0; j < 7; j++) {
+	//	filter[7 * j + i] = gaussian5[i] * gaussian5[j];
+	//}
+
+	//GLuint filterKernelLoc = glGetUniformLocation(renderer->shaderProgram, "filterKernel");
+	//GLuint kSizeLoc = glGetUniformLocation(renderer->shaderProgram, "kSize");
+	//glUniform1fv(filterKernelLoc, 49, filter);
+	//glUniform1i(kSizeLoc, 7);
+
+	//if (renderer->CheckGLErrors()) {
+	//	std::cout << "Texture creation failed" << std::endl;
+	//}
+
+	//rectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	//rectangle.verts.push_back(glm::vec3(0.0f, -0.9f, 1.0f));
+	//rectangle.verts.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	//rectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	//rectangle.verts.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	//rectangle.verts.push_back(glm::vec3(-0.9f, 0.0f, 1.0f));
+
+	//rectangle.drawMode = GL_TRIANGLES;
+
+	//rectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	//rectangle.uvs.push_back(glm::vec2(float(fgTexture.width), 0.f));
+	//rectangle.uvs.push_back(glm::vec2(float(fgTexture.width), float(fgTexture.height)));
+	//rectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	//rectangle.uvs.push_back(glm::vec2(float(fgTexture.width), float(fgTexture.height)));
+	//rectangle.uvs.push_back(glm::vec2(0.0f, float(fgTexture.height)));
+
+	//RenderingEngine::assignBuffers(rectangle);
+
+	////Send the rectangle data to the GPU
+	////Must be done every time the triangle is modified in any way, ex. verts, colors, normals, uvs, etc.
+	//RenderingEngine::setBufferData(rectangle);
+
+	//objects.push_back(rectangle);
+	//renderer->RenderScene(objects);
+	glUseProgram(renderer->shaderProgram2);
+	MyTexture bgTexture;
+	InitializeTexture(&bgTexture, "background3-wood.jpg", GL_TEXTURE_RECTANGLE);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_RECTANGLE, bgTexture.textureID);
+
+	GLuint bgLoc = glGetUniformLocation(renderer->shaderProgram2, "bgTexture");
+	glUniform1i(bgLoc, 0);
+	Geometry g1;
+	g1.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	g1.verts.push_back(glm::vec3(0.9f, -0.9f, 1.0f));
+	g1.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
+	g1.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	g1.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
+	g1.verts.push_back(glm::vec3(-0.9f, 0.9f, 1.0f));
+
+	g1.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	g1.uvs.push_back(glm::vec2(float(bgTexture.width), 0.f));
+	g1.uvs.push_back(glm::vec2(float(bgTexture.width), float(bgTexture.height)));
+	g1.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	g1.uvs.push_back(glm::vec2(float(bgTexture.width), float(bgTexture.height)));
+	g1.uvs.push_back(glm::vec2(0.0f, float(bgTexture.height)));
+
+	g1.drawMode = GL_TRIANGLES;
+	renderer->RenderBackground(g1);
+
 	glUseProgram(renderer->shaderProgram);
-	//Set which texture unit the texture is bound to
+
+	MyTexture fgTexture;
+	InitializeTexture(&fgTexture, "image2-uclogo.png", GL_TEXTURE_RECTANGLE);
 	glActiveTexture(GL_TEXTURE1);
-	//Bind the texture to GL_TEXTURE0
 	glBindTexture(GL_TEXTURE_RECTANGLE, fgTexture.textureID);
-	//Get identifier for uniform
-	GLuint uniformLocation = glGetUniformLocation(renderer->shaderProgram, "imageTexture");
 
-	//Load texture unit number into uniform
-	glUniform1i(uniformLocation, 1);
+	GLuint fgLoc = glGetUniformLocation(renderer->shaderProgram, "fgTexture");
+	glUniform1i(fgLoc, 1);
 
-	std::vector<GLfloat> gaussian5 = gaussian1D(7);
-	GLfloat filter[49];
-	for (int i = 0; i < 7; i++) for (int j = 0; j < 7; j++) {
-		filter[7 * j + i] = gaussian5[i] * gaussian5[j];
-	}
+	Geometry g2;
+	g2.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	g2.verts.push_back(glm::vec3(0.9f, -0.9f, 1.0f));
+	g2.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
+	g2.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	g2.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
+	g2.verts.push_back(glm::vec3(-0.9f, 0.9f, 1.0f));
 
-	GLuint filterKernelLoc = glGetUniformLocation(renderer->shaderProgram, "filterKernel");
-	GLuint kSizeLoc = glGetUniformLocation(renderer->shaderProgram, "kSize");
-	glUniform1fv(filterKernelLoc, 49, filter);
-	glUniform1i(kSizeLoc, 7);
+	g2.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	g2.uvs.push_back(glm::vec2(float(fgTexture.width), 0.f));
+	g2.uvs.push_back(glm::vec2(float(fgTexture.width), float(fgTexture.height)));
+	g2.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	g2.uvs.push_back(glm::vec2(float(fgTexture.width), float(fgTexture.height)));
+	g2.uvs.push_back(glm::vec2(0.0f, float(fgTexture.height)));
 
-	if (renderer->CheckGLErrors()) {
-		std::cout << "Texture creation failed" << std::endl;
-	}
+	g2.drawMode = GL_TRIANGLES;
 
-	rectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3(0.0f, -0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
-	rectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
-	rectangle.verts.push_back(glm::vec3(-0.9f, 0.0f, 1.0f));
+	renderer->assignBuffers(g2);
+	renderer->setBufferData(g2);
+	glBindVertexArray(g2.vao);
+	glDrawArrays(g2.drawMode, 0, g2.verts.size());
 
-	rectangle.drawMode = GL_TRIANGLES;
-
-	rectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
-	rectangle.uvs.push_back(glm::vec2(float(fgTexture.width), 0.f));
-	rectangle.uvs.push_back(glm::vec2(float(fgTexture.width), float(fgTexture.height)));
-	rectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
-	rectangle.uvs.push_back(glm::vec2(float(fgTexture.width), float(fgTexture.height)));
-	rectangle.uvs.push_back(glm::vec2(0.0f, float(fgTexture.height)));
-
-	RenderingEngine::assignBuffers(rectangle);
-
-	//Send the rectangle data to the GPU
-	//Must be done every time the triangle is modified in any way, ex. verts, colors, normals, uvs, etc.
-	RenderingEngine::setBufferData(rectangle);
-
-	objects.push_back(rectangle);
-	renderer->RenderScene(objects);
+	renderer->RenderScene({ g2 });
 }
 
 void Scene::updateBackground(int idx) {

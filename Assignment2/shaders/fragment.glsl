@@ -12,12 +12,10 @@ in vec2 uv;
 // first output is mapped to the framebuffer's colour index by default
 out vec4 FragmentColour;
 
-uniform sampler2DRect imageTexture;
-uniform int time;
+uniform sampler2DRect fgTexture;
 
 void main(void)
 {
-	FragmentColour = vec4(0.0, 1.0, 0.0, 0.3);
-	// FragmentColour = texture(imageTexture, uv);
-	// FragmentColour[3] = 0.3;
+	FragmentColour = texture(fgTexture, uv);
+	FragmentColour[3] = 0.3;
 }
