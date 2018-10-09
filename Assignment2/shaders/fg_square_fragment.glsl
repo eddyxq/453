@@ -28,15 +28,24 @@ vec4 computeFilterColor(vec2 uv) {
 	}
 	else if (l == 1)
 	{
-		filterColor = vec4(original.r*0.333, original.g*0.333, original.b*0.333, original.a);
+		filterColor = vec4((original.r*0.333) + (original.g*0.333) + (original.b*0.333),
+						   (original.r*0.333) + (original.g*0.333) + (original.b*0.333),
+						   (original.r*0.333) + (original.g*0.333) + (original.b*0.333),
+						   original.a);
 	}
 	else if (l == 2)
 	{
-		filterColor = vec4(original.r*0.299, original.g*0.587, original.b*0.114, original.a);
+		filterColor = vec4((original.r*0.299) + (original.g*0.587) + (original.b*0.114),
+						   (original.r*0.299) + (original.g*0.587) + (original.b*0.114),
+						   (original.r*0.299) + (original.g*0.587) + (original.b*0.114),
+						   original.a);
 	}
 	else if (l == 3)
 	{
-		filterColor = vec4(original.r*0.213, original.g*0.715, original.b*0.072, original.a);
+		filterColor = vec4((original.r*0.213) + (original.g*0.715) + (original.b*0.072),
+						   (original.r*0.213) + (original.g*0.715) + (original.b*0.072),
+						   (original.r*0.213) + (original.g*0.715) + (original.b*0.072),
+						   original.a);
 	}
 	else if (l == 4)
 	{
