@@ -13,11 +13,40 @@ in vec2 uv;
 out vec4 FragmentColour;
 
 uniform sampler2DRect fgTexture;
-uniform int time;
+uniform float l;
 
 // only square kernels with odd side length are supported
 uniform int kSize;
 uniform float filterKernel[50];
+
+vec4 computeFilterColor(vec2 uv) {
+	vec4 filterColor;
+	vec4 original = texture(fgTexture, uv);
+	if (l == 0)
+	{
+		filterColor = original;
+	}
+	else if (l == 1)
+	{
+		filterColor = vec4(original.r*0.333, original.g*0.333, original.b*0.333, original.a);
+	}
+	else if (l == 2)
+	{
+		filterColor = vec4(original.r*0.299, original.g*0.587, original.b*0.114, original.a);
+	}
+	else if (l == 3)
+	{
+		filterColor = vec4(original.r*0.213, original.g*0.715, original.b*0.072, original.a);
+	}
+	else if (l == 4)
+	{
+		filterColor = vec4((original.r * .393) + (original.g *.769) + (original.b * .189), 
+		                   (original.r * .349) + (original.g *.686) + (original.b * .168), 
+						   (original.r * .272) + (original.g *.534) + (original.b * .131), 
+						    original.a);
+	}
+	return filterColor;
+}
 
 void main(void)
 {
@@ -26,10 +55,8 @@ void main(void)
 		float ans = 0.0f;
 		for (int i = 0; i < kSize; i++) {
 			for (int j = 0; j < kSize; j++) {
-				ivec2 pos = {int(uv.x)+j-kSize/2, int(uv.y)+i-kSize/2};
-				// if (ivec.x < 0) ivec.x = 0;
-				// if (ivec.x > 
-				vec4 pixel = texelFetch(fgTexture, pos);
+				vec2 pos = {uv.x+j-kSize/2, uv.y+i-kSize/2};
+				vec4 pixel = computeFilterColor(pos);
 				ans += filterKernel[kSize*kSize-1 - (3*i+j)] * pixel[k];
 			}
 		}

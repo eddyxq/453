@@ -141,7 +141,7 @@ bool RenderingEngine::CheckGLErrors() {
 	bool error = false;
 	for (GLenum flag = glGetError(); flag != GL_NO_ERROR; flag = glGetError())
 	{
-		std::cout << "OpenGL ERROR:  ";
+		std::cout << "OpenGL ERROR: ";
 		switch (flag) {
 		case GL_INVALID_ENUM:
 			std::cout << "GL_INVALID_ENUM" << std::endl; break;
