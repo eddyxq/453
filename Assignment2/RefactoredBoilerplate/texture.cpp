@@ -3,6 +3,7 @@
 #include "stb/stb_image.h"
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -34,6 +35,11 @@ bool CheckGLErrors(const char* errorLocation)
 MyTexture::MyTexture() : textureID(0), target(0), width(0), height(0)
 	{}
 
+
+std::vector<MyTexture*> getTextures(std::vector<std::string> fileNames, std::vector<GLenum> targets) {
+	std::vector<MyTexture*> ret;
+	return ret;
+}
 
 bool InitializeTexture(MyTexture* texture, const char* filename, GLenum target)
 {

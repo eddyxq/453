@@ -25,17 +25,19 @@ public:
 
 	//Renders each object
 	void RenderScene(const std::vector<Geometry>& objects);
+	void RenderBackground(const Geometry& bg);
 
 	//Create vao and vbos for objects
 	static void assignBuffers(Geometry& geometry);
 	static void setBufferData(Geometry& geometry);
-	static void deleteBufferData(Geometry& geometry);
+	static void deleteBufferData(const Geometry& geometry);
 
 	//Ensures that vao and vbos are set up properly
 	bool CheckGLErrors();
 
 	//Pointer to the current shader program being used to render
 	GLuint shaderProgram;
+	GLuint shaderProgram2;
 
 	//
 	int time;

@@ -24,22 +24,28 @@
 #include <iomanip>
 
 Scene::Scene(RenderingEngine* renderer) : renderer(renderer) {
+	InitializeTexture(&fgTexture, FG_IMG2, GL_TEXTURE_RECTANGLE);
+	InitializeTexture(&bgTexture, BG_IMG3, GL_TEXTURE_RECTANGLE);
+}
 
-	MyTexture texture;
-	InitializeTexture(&texture, "image1-mandrill.png", GL_TEXTURE_RECTANGLE);
+Scene::~Scene() {
 
+}
+
+void Scene::displayScene() {
+	objects.clear();
 	//Load texture uniform
 	//Shaders need to be active to load uniforms
 	glUseProgram(renderer->shaderProgram);
 	//Set which texture unit the texture is bound to
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE1);
 	//Bind the texture to GL_TEXTURE0
-	glBindTexture(GL_TEXTURE_RECTANGLE, texture.textureID);
+	glBindTexture(GL_TEXTURE_RECTANGLE, fgTexture.textureID);
 	//Get identifier for uniform
 	GLuint uniformLocation = glGetUniformLocation(renderer->shaderProgram, "imageTexture");
-	
+
 	//Load texture unit number into uniform
-	glUniform1i(uniformLocation, 0);
+	glUniform1i(uniformLocation, 1);
 
 	std::vector<GLfloat> gaussian5 = gaussian1D(7);
 	GLfloat filter[49];
@@ -52,54 +58,69 @@ Scene::Scene(RenderingEngine* renderer) : renderer(renderer) {
 	glUniform1fv(filterKernelLoc, 49, filter);
 	glUniform1i(kSizeLoc, 7);
 
-	if(renderer->CheckGLErrors()) {
+	if (renderer->CheckGLErrors()) {
 		std::cout << "Texture creation failed" << std::endl;
 	}
 
-		// three vertex positions and assocated colours of a triangle
-	rectangle.verts.push_back(glm::vec3( -0.9f, -0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3( 0.9f,  -0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3( 0.9f, 0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3( -0.9f, -0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3( 0.9f, 0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3( -0.9f, 0.9f, 1.0f));
-
-	/*rectangle.colors.push_back(glm::vec3( 1.0f, 0.0f, 0.0f));
-	rectangle.colors.push_back(glm::vec3( 1.0f, 0.0f, 0.0f));
-	rectangle.colors.push_back(glm::vec3( 1.0f, 0.0f, 0.0f));
-	rectangle.colors.push_back(glm::vec3( 1.0f, 0.0f, 0.0f));
-	rectangle.colors.push_back(glm::vec3( 1.0f, 0.0f, 0.0f));
-	rectangle.colors.push_back(glm::vec3( 1.0f, 0.0f, 0.0f));*/
-
-
+	rectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	rectangle.verts.push_back(glm::vec3(0.0f, -0.9f, 1.0f));
+	rectangle.verts.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	rectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	rectangle.verts.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	rectangle.verts.push_back(glm::vec3(-0.9f, 0.0f, 1.0f));
 
 	rectangle.drawMode = GL_TRIANGLES;
 
-	rectangle.uvs.push_back(glm::vec2( 0.0f, 0.0f));
-	rectangle.uvs.push_back(glm::vec2( float(texture.width), 0.f));
-	rectangle.uvs.push_back(glm::vec2( float(texture.width), float(texture.height)));
-	rectangle.uvs.push_back(glm::vec2( 0.0f, 0.0f));
-	rectangle.uvs.push_back(glm::vec2( float(texture.width), float(texture.height)));
-	rectangle.uvs.push_back(glm::vec2(0.0f, float(texture.height)));
+	rectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	rectangle.uvs.push_back(glm::vec2(float(fgTexture.width), 0.f));
+	rectangle.uvs.push_back(glm::vec2(float(fgTexture.width), float(fgTexture.height)));
+	rectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	rectangle.uvs.push_back(glm::vec2(float(fgTexture.width), float(fgTexture.height)));
+	rectangle.uvs.push_back(glm::vec2(0.0f, float(fgTexture.height)));
 
-	//Construct vao and vbos for the triangle
 	RenderingEngine::assignBuffers(rectangle);
 
-	//Send the triangle data to the GPU
+	//Send the rectangle data to the GPU
 	//Must be done every time the triangle is modified in any way, ex. verts, colors, normals, uvs, etc.
 	RenderingEngine::setBufferData(rectangle);
 
-	//Add the triangle to the scene objects
 	objects.push_back(rectangle);
-
-}
-
-Scene::~Scene() {
-
-}
-
-void Scene::displayScene() {
 	renderer->RenderScene(objects);
+}
+
+void Scene::updateBackground(int idx) {
+	glUseProgram(renderer->shaderProgram2);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_RECTANGLE, bgTexture.textureID);
+
+	GLuint uniformLocation = glGetUniformLocation(renderer->shaderProgram2, "bgTexture");
+	glUniform1i(uniformLocation, 0);
+
+	Geometry rectangle;
+	rectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	rectangle.verts.push_back(glm::vec3(0.9f, -0.9f, 1.0f));
+	rectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
+	rectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	rectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
+	rectangle.verts.push_back(glm::vec3(-0.9f, 0.9f, 1.0f));
+
+	rectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	rectangle.uvs.push_back(glm::vec2(float(bgTexture.width), 0.f));
+	rectangle.uvs.push_back(glm::vec2(float(bgTexture.width), float(bgTexture.height)));
+	rectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	rectangle.uvs.push_back(glm::vec2(float(bgTexture.width), float(bgTexture.height)));
+	rectangle.uvs.push_back(glm::vec2(0.0f, float(bgTexture.height)));
+
+	rectangle.drawMode = GL_TRIANGLES;
+
+	renderer->assignBuffers(rectangle);
+	renderer->setBufferData(rectangle);
+	glBindVertexArray(rectangle.vao);
+	glDrawArrays(GL_TRIANGLES, 0, rectangle.verts.size());
+	glBindVertexArray(0);
+
+	renderer->RenderBackground(rectangle);
 }
 
 void Scene::switchScene(int idx) {

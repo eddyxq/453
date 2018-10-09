@@ -22,7 +22,7 @@ uniform float filterKernel[50];
 void main(void)
 {
 	vec4 p = texture(imageTexture, uv);
-	for (int k = 0; k < 4; k++) {
+	for (int k = 0; k < 3; k++) {
 		float ans = 0.0f;
 		for (int i = 0; i < kSize; i++) {
 			for (int j = 0; j < kSize; j++) {
@@ -34,5 +34,6 @@ void main(void)
 		if (ans < 0) ans *= -1;
 		FragmentColour[k] = ans;
 	}
+	FragmentColour[3] = 0.5;
 	// FragmentColour = texture(imageTexture, uv + offset);
 }

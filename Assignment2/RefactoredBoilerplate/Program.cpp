@@ -33,6 +33,7 @@ void Program::start() {
 
 	//Main render loop
 	while (!glfwWindowShouldClose(window)) {
+		// scene->updateBackground(0);
 		scene->displayScene();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -65,6 +66,7 @@ void Program::setupWindow() {
 		return;
 	}
 
+	glfwSetWindowUserPointer(window, this);
 	//Set the custom function that tracks key presses
 	glfwSetKeyCallback(window, KeyCallback);
 
