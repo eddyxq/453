@@ -248,28 +248,34 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	//press a to rotate counter clockwise
 	if (key == GLFW_KEY_A && action == GLFW_PRESS) 
 	{
-		renderer->degree += 45;
+		program->getScene()->updateVertices(0.0f, 0.0f, -18.0f);
+		program->getScene()->stopVerticesUpdate();
 	}
 	//press a to rotate clockwise
 	if (key == GLFW_KEY_D && action == GLFW_PRESS) 
 	{
-		renderer->degree -= 45;
+		program->getScene()->updateVertices(0.0f, 0.0f, 18.0f);
+		program->getScene()->stopVerticesUpdate();
 	}
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
+	Program* program = (Program*)glfwGetWindowUserPointer(window);
 	//scroll forward to zoom in
 	if (yoffset == 1) 
 	{
-		renderer->zoom += 1;
+		if (renderer->zoom < 3.0f) {
+			renderer->zoom += 0.1f;
+			program->getScene()->updateZoom(renderer->zoom);
+		}
 	}
 	//scroll backward to zoom out
 	else if (yoffset == -1)
 	{
-		if (renderer->zoom > 1)
-		{
-			renderer->zoom -= 1;
+		if (renderer->zoom > 0.5f) {
+			renderer->zoom -= 0.1f;
+			program->getScene()->updateZoom(renderer->zoom);
 		}
 	}
 }
@@ -279,6 +285,7 @@ double ry;
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
+	Program* program = (Program*)glfwGetWindowUserPointer(window);
 	GLboolean leftDown;
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
@@ -295,7 +302,9 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	}
 	if (leftDown)
 	{
-		renderer->cursor_y = (ypos-ry)/-512/2;
-		renderer->cursor_x = (xpos-rx)/512/2;
+		program->getScene()->updateVertices((xpos-rx)/512/2, (ypos - ry) / -512 / 2, 0.0f);
+	}
+	else {
+		program->getScene()->stopVerticesUpdate();
 	}
 }

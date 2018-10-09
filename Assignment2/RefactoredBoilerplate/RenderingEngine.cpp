@@ -78,8 +78,6 @@ void RenderingEngine::RenderScene(const std::vector<Geometry>& objects) {
 
 	// check for an report any OpenGL errors
 	CheckGLErrors();
-
-	std::cout << degree << std::endl;
 }
 
 void RenderingEngine::assignBuffers(Geometry& geometry) {

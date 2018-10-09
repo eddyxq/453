@@ -30,6 +30,10 @@ public:
 	void selectForeground(int idx);
 	void selectBackground(int idx);
 
+	void updateVertices(float dx, float dy, float degree);
+	void stopVerticesUpdate();
+	void updateZoom(float zoom);
+
 private:
 	RenderingEngine* renderer;
 
@@ -76,12 +80,17 @@ private:
 
 	int sceneIdx;
 
-	const std::vector<std::string> fgImages = { FG_IMG1, FG_IMG2, FG_IMG3, FG_IMG4, FG_IMG5, FG_IMG6 };
+	const std::vector<std::string> fgImages = { FG_IMG1, FG_IMG2, FG_IMG3, FG_IMG4, FG_IMG5, FG_IMG6, FG_IMG7 };
 	const std::vector<std::string> bgImages = { BG_IMG1, BG_IMG2, BG_IMG3 };
 	std::vector<MyTexture> foregrounds;
 	std::vector<MyTexture> backgrounds;
 
 	void selectFilter();
+
+	std::vector<glm::vec3> fgVertices;
+	std::vector<glm::vec3> bgVertices;
+
+	float prevX, prevY, prevDeg, prevZoom;
 };
 
 #endif /* SCENE_H_ */

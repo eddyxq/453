@@ -85,24 +85,7 @@ void Scene::displayScene() {
 	GLuint fgLoc = glGetUniformLocation(renderer->shaderProgram, "fgTexture");
 	glUniform1i(fgLoc, 1);
 
-	if (fgTexture.width <= fgTexture.height) {
-		float ratio = float(fgTexture.width) / float(fgTexture.height);
-		fgRectangle.verts.push_back(glm::vec3(ratio * -1.0f, -1.0f, 1.0f));
-		fgRectangle.verts.push_back(glm::vec3(ratio * 1.0f, -1.0f, 1.0f));
-		fgRectangle.verts.push_back(glm::vec3(ratio * 1.0f, 1.0f, 1.0f));
-		fgRectangle.verts.push_back(glm::vec3(ratio * -1.0f, -1.0f, 1.0f));
-		fgRectangle.verts.push_back(glm::vec3(ratio * 1.0f, 1.0f, 1.0f));
-		fgRectangle.verts.push_back(glm::vec3(ratio * -1.0f, 1.0f, 1.0f));
-	}
-	else {
-		float ratio = float(fgTexture.height) / float(fgTexture.width);
-		fgRectangle.verts.push_back(glm::vec3(-1.0f, ratio * -1.0f, 1.0f));
-		fgRectangle.verts.push_back(glm::vec3(1.0f, ratio * -1.0f, 1.0f));
-		fgRectangle.verts.push_back(glm::vec3(1.0f, ratio * 1.0f, 1.0f));
-		fgRectangle.verts.push_back(glm::vec3(-1.0f, ratio * -1.0f, 1.0f));
-		fgRectangle.verts.push_back(glm::vec3(1.0f, ratio * 1.0f, 1.0f));
-		fgRectangle.verts.push_back(glm::vec3(-1.0f, ratio * 1.0f, 1.0f));
-	}
+	fgRectangle.verts.insert(fgRectangle.verts.end(), fgVertices.begin(), fgVertices.end());
 
 	fgRectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
 	fgRectangle.uvs.push_back(glm::vec2(float(fgTexture.width), 0.f));
@@ -119,6 +102,30 @@ void Scene::displayScene() {
 	glDrawArrays(fgRectangle.drawMode, 0, fgRectangle.verts.size());
 
 	renderer->RenderScene({ fgRectangle });
+}
+
+void Scene::updateVertices(float x, float y, float degree) {
+	const double PI = std::atan(1) * 4;
+	for (glm::vec3& v : fgVertices) {
+		v.x += x - prevX;
+		v.y += y - prevY;
+		float cx = v.x, cy = v.y;
+		double angle = PI * (degree - prevDeg) / 180.0f;
+		v.y = std::sin(angle)*cx + std::cos(angle)*cy;
+		v.x = std::cos(angle)*cx - std::sin(angle)*cy;
+	}
+	prevX = x, prevY = y, prevDeg = degree;
+}
+
+void Scene::updateZoom(float zoom) {
+	for (glm::vec3& v : fgVertices) {
+		v.x *= zoom;
+		v.y *= zoom;
+	}
+}
+
+void Scene::stopVerticesUpdate() {
+	prevX = 0.0f, prevY = 0.0f, prevDeg = 0.0f;
 }
 
 void Scene::selectFilter(int idx) {
@@ -163,6 +170,25 @@ void Scene::selectFilter() {
 
 void Scene::selectForeground(int idx) {
 	fgTexture = foregrounds[idx];
+	fgVertices.clear();
+	if (fgTexture.width <= fgTexture.height) {
+		float ratio = float(fgTexture.width) / float(fgTexture.height);
+		fgVertices.push_back(glm::vec3(ratio * -1.0f, -1.0f, 1.0f));
+		fgVertices.push_back(glm::vec3(ratio * 1.0f, -1.0f, 1.0f));
+		fgVertices.push_back(glm::vec3(ratio * 1.0f, 1.0f, 1.0f));
+		fgVertices.push_back(glm::vec3(ratio * -1.0f, -1.0f, 1.0f));
+		fgVertices.push_back(glm::vec3(ratio * 1.0f, 1.0f, 1.0f));
+		fgVertices.push_back(glm::vec3(ratio * -1.0f, 1.0f, 1.0f));
+	}
+	else {
+		float ratio = float(fgTexture.height) / float(fgTexture.width);
+		fgVertices.push_back(glm::vec3(-1.0f, ratio * -1.0f, 1.0f));
+		fgVertices.push_back(glm::vec3(1.0f, ratio * -1.0f, 1.0f));
+		fgVertices.push_back(glm::vec3(1.0f, ratio * 1.0f, 1.0f));
+		fgVertices.push_back(glm::vec3(-1.0f, ratio * -1.0f, 1.0f));
+		fgVertices.push_back(glm::vec3(1.0f, ratio * 1.0f, 1.0f));
+		fgVertices.push_back(glm::vec3(-1.0f, ratio * 1.0f, 1.0f));
+	}
 }
 
 void Scene::selectBackground(int idx) {
