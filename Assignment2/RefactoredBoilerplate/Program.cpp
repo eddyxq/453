@@ -302,7 +302,7 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	}
 	if (leftDown)
 	{
-		program->getScene()->updateVertices((xpos-rx)/512/2, (ypos - ry) / -512 / 2, 0.0f);
+		program->getScene()->updateVertices((xpos-rx) / 256, (ypos - ry) / -256, 0.0f);
 	}
 	else {
 		program->getScene()->stopVerticesUpdate();

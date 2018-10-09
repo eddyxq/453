@@ -90,7 +90,7 @@ private:
 	std::vector<glm::vec3> fgVertices;
 	std::vector<glm::vec3> bgVertices;
 
-	float prevX, prevY, prevDeg, prevZoom;
+	float prevX, prevY, prevDeg, prevZoom = 1.0f;
 };
 
 #endif /* SCENE_H_ */

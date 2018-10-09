@@ -119,9 +119,10 @@ void Scene::updateVertices(float x, float y, float degree) {
 
 void Scene::updateZoom(float zoom) {
 	for (glm::vec3& v : fgVertices) {
-		v.x *= zoom;
-		v.y *= zoom;
+		v.x *= (zoom / prevZoom);
+		v.y *= (zoom / prevZoom);
 	}
+	prevZoom = zoom;
 }
 
 void Scene::stopVerticesUpdate() {
@@ -135,7 +136,9 @@ void Scene::selectFilter(int idx) {
 void Scene::selectFilter() {
 	GLuint filterKernelLoc = glGetUniformLocation(renderer->shaderProgram, "filterKernel");
 	GLuint kSizeLoc = glGetUniformLocation(renderer->shaderProgram, "kSize");
-	std::vector<GLfloat> bgRectangle = { 0.155f, 0.22f, 0.25f, 0.22f, 0.155f };
+	std::vector<GLfloat> gaussianFilter3 = { 0.315f, 0.36f, 0.315f };
+	std::vector<GLfloat> gaussianFilter5 = { 0.155f, 0.22f, 0.25f, 0.22f, 0.155f };
+	std::vector<GLfloat> gaussianFilter7 = { 0.07f, 0.13f, 0.19f, 0.21f, 0.19f, 0.13f, 0.07f};
 	switch (sceneIdx) {
 	case 0:
 		glUniform1fv(filterKernelLoc, 1, identity);
@@ -154,14 +157,28 @@ void Scene::selectFilter() {
 		glUniform1i(kSizeLoc, 3);
 		break;
 	case 4:
-	case 5:
-	case 6:
-		GLfloat filter[25];
-		for (int i = 0; i < 5; i++) for (int j = 0; j < 5; j++) {
-			filter[5 * j + i] = bgRectangle[i] * bgRectangle[j];
+		GLfloat filter3[9];
+		for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) {
+			filter3[3 * j + i] = gaussianFilter3[i] * gaussianFilter3[j];
 		}
-		glUniform1fv(filterKernelLoc, 25, filter);
+		glUniform1fv(filterKernelLoc, 9, filter3);
+		glUniform1i(kSizeLoc, 3);
+		break;
+	case 5:
+		GLfloat filter5[25];
+		for (int i = 0; i < 5; i++) for (int j = 0; j < 5; j++) {
+			filter5[5 * j + i] = gaussianFilter5[i] * gaussianFilter5[j];
+		}
+		glUniform1fv(filterKernelLoc, 25, filter5);
 		glUniform1i(kSizeLoc, 5);
+		break;
+	case 6:
+		GLfloat filter7[49];
+		for (int i = 0; i < 7; i++) for (int j = 0; j < 7; j++) {
+			filter7[7 * j + i] = gaussianFilter7[i] * gaussianFilter7[j];
+		}
+		glUniform1fv(filterKernelLoc, 49, filter7);
+		glUniform1i(kSizeLoc, 7);
 		break;
 	default:
 		break;
