@@ -28,6 +28,13 @@ public:
 	//Prints system specs to the console
 	void QueryGLVersion();
 
+	Scene* getScene() {
+		return scene;
+	}
+
+	enum SelectionState { NONE, COLOR_EFFECT, BACKGROUND, FOREGROUND, FILTER };
+	SelectionState selectionState;
+
 private:
 	GLFWwindow * window;
 	RenderingEngine* renderingEngine;

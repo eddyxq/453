@@ -26,22 +26,18 @@ MyTexture texture, texture2, texture3, texture4, texture5, texture6, texture7;
 
 Scene::Scene(RenderingEngine* renderer) : renderer(renderer) {
 	//initialize all the images
-	InitializeTexture(&texture, "image1-mandrill.png", GL_TEXTURE_RECTANGLE);
-	InitializeTexture(&texture2, "image2-uclogo.png", GL_TEXTURE_RECTANGLE);
-	InitializeTexture(&texture3, "image3-aerial.jpg", GL_TEXTURE_RECTANGLE);
-	InitializeTexture(&texture4, "image4-thirsk.jpg", GL_TEXTURE_RECTANGLE);
-	InitializeTexture(&texture5, "image5-pattern.png", GL_TEXTURE_RECTANGLE);
-	InitializeTexture(&texture6, "image6-bubble.png", GL_TEXTURE_RECTANGLE);
-	InitializeTexture(&texture7, "image7-hourglass.png", GL_TEXTURE_RECTANGLE);
-
-	glUseProgram(renderer->shaderProgram);
-	glActiveTexture(GL_TEXTURE0);
-	GLuint uniformLocation = glGetUniformLocation(renderer->shaderProgram, "imageTexture");
-	glUniform1i(uniformLocation, 0);
-
-	if(renderer->CheckGLErrors()) {
-		std::cout << "Texture creation failed" << std::endl;
+	for (std::string file : fgImages) {
+		MyTexture texture;
+		InitializeTexture(&texture, file.c_str(), GL_TEXTURE_RECTANGLE);
+		foregrounds.push_back(texture);
 	}
+	for (std::string file : bgImages) {
+		MyTexture texture;
+		InitializeTexture(&texture, file.c_str(), GL_TEXTURE_RECTANGLE);
+		backgrounds.push_back(texture);
+	}
+	fgTexture = foregrounds[0];
+	bgTexture = backgrounds[0];
 }
 
 Scene::~Scene() {
@@ -49,67 +45,128 @@ Scene::~Scene() {
 }
 
 void Scene::displayScene() {
-	renderer->RenderScene(objects);
+	RenderingEngine::deleteBufferData(fgRectangle);
+	fgRectangle.verts.clear();
+	fgRectangle.uvs.clear();
+	RenderingEngine::deleteBufferData(bgRectangle);
+	bgRectangle.verts.clear();
+	bgRectangle.uvs.clear();
+
+	glUseProgram(renderer->shaderProgram2);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_RECTANGLE, bgTexture.textureID);
+
+	GLuint bgLoc = glGetUniformLocation(renderer->shaderProgram2, "bgTexture");
+	glUniform1i(bgLoc, 0);
+
+	bgRectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	bgRectangle.verts.push_back(glm::vec3(0.9f, -0.9f, 1.0f));
+	bgRectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
+	bgRectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	bgRectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
+	bgRectangle.verts.push_back(glm::vec3(-0.9f, 0.9f, 1.0f));
+
+	bgRectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	bgRectangle.uvs.push_back(glm::vec2(float(bgTexture.width), 0.f));
+	bgRectangle.uvs.push_back(glm::vec2(float(bgTexture.width), float(bgTexture.height)));
+	bgRectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	bgRectangle.uvs.push_back(glm::vec2(float(bgTexture.width), float(bgTexture.height)));
+	bgRectangle.uvs.push_back(glm::vec2(0.0f, float(bgTexture.height)));
+
+	bgRectangle.drawMode = GL_TRIANGLES;
+	renderer->RenderBackground(bgRectangle);
+
+	glUseProgram(renderer->shaderProgram);
+	selectFilter();
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_RECTANGLE, fgTexture.textureID);
+
+	GLuint fgLoc = glGetUniformLocation(renderer->shaderProgram, "fgTexture");
+	glUniform1i(fgLoc, 1);
+
+	fgRectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	fgRectangle.verts.push_back(glm::vec3(0.9f, -0.9f, 1.0f));
+	fgRectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
+	fgRectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
+	fgRectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
+	fgRectangle.verts.push_back(glm::vec3(-0.9f, 0.9f, 1.0f));
+
+	fgRectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	fgRectangle.uvs.push_back(glm::vec2(float(fgTexture.width), 0.f));
+	fgRectangle.uvs.push_back(glm::vec2(float(fgTexture.width), float(fgTexture.height)));
+	fgRectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	fgRectangle.uvs.push_back(glm::vec2(float(fgTexture.width), float(fgTexture.height)));
+	fgRectangle.uvs.push_back(glm::vec2(0.0f, float(fgTexture.height)));
+
+	fgRectangle.drawMode = GL_TRIANGLES;
+
+	renderer->assignBuffers(fgRectangle);
+	renderer->setBufferData(fgRectangle);
+	glBindVertexArray(fgRectangle.vao);
+	glDrawArrays(fgRectangle.drawMode, 0, fgRectangle.verts.size());
+
+	renderer->RenderScene({ fgRectangle });
 }
 
-void Scene::refresh(int num)
-{
-	RenderingEngine::deleteBufferData(rectangle);
-	objects.clear();
-	rectangle.verts.clear();
-	rectangle.uvs.clear();
-	MyTexture current_texture;
-
-	if (num == 1)
-	{
-		current_texture = texture;
-		glBindTexture(GL_TEXTURE_RECTANGLE, texture.textureID);
-	}
-	else if (num == 2)
-	{
-		current_texture = texture2;
-		glBindTexture(GL_TEXTURE_RECTANGLE, texture2.textureID);
-	}
-	else if (num == 3)
-	{
-		current_texture = texture3;
-		glBindTexture(GL_TEXTURE_RECTANGLE, texture3.textureID);
-	}
-	else if (num == 4)
-	{
-		current_texture = texture4;
-		glBindTexture(GL_TEXTURE_RECTANGLE, texture4.textureID);
-	}
-	else if (num == 5)
-	{
-		current_texture = texture5;
-		glBindTexture(GL_TEXTURE_RECTANGLE, texture5.textureID);
-	}
-	else if (num == 6)
-	{
-		current_texture = texture6;
-		glBindTexture(GL_TEXTURE_RECTANGLE, texture6.textureID);
-	}
-	else if (num == 7)
-	{
-		current_texture = texture7;
-		glBindTexture(GL_TEXTURE_RECTANGLE, texture7.textureID);
-	}
-
-	rectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3(0.9f, -0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
-	rectangle.verts.push_back(glm::vec3(-0.9f, 0.9f, 1.0f));
-	rectangle.drawMode = GL_TRIANGLES;
-	rectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
-	rectangle.uvs.push_back(glm::vec2(float(current_texture.width), 0.0f));
-	rectangle.uvs.push_back(glm::vec2(float(current_texture.width), float(current_texture.height)));
-	rectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
-	rectangle.uvs.push_back(glm::vec2(float(current_texture.width), float(current_texture.height)));
-	rectangle.uvs.push_back(glm::vec2(0.0f, float(current_texture.height)));
-	RenderingEngine::assignBuffers(rectangle);
-	RenderingEngine::setBufferData(rectangle);
-	objects.push_back(rectangle);
+void Scene::selectFilter(int idx) {
+	sceneIdx = idx;
 }
+
+void Scene::selectFilter() {
+	GLuint filterKernelLoc = glGetUniformLocation(renderer->shaderProgram, "filterKernel");
+	GLuint kSizeLoc = glGetUniformLocation(renderer->shaderProgram, "kSize");
+	std::vector<GLfloat> bgRectangle = { 0.155f, 0.22f, 0.25f, 0.22f, 0.155f };
+	switch (sceneIdx) {
+	case 0:
+		glUniform1fv(filterKernelLoc, 1, identity);
+		glUniform1i(kSizeLoc, 1);
+		break;
+	case 1:
+		glUniform1fv(filterKernelLoc, 9, vertical_sobel);
+		glUniform1i(kSizeLoc, 3);
+		break;
+	case 2:
+		glUniform1fv(filterKernelLoc, 9, horizontal_sobel);
+		glUniform1i(kSizeLoc, 3);
+		break;
+	case 3:
+		glUniform1fv(filterKernelLoc, 9, unsharpen_mask);
+		glUniform1i(kSizeLoc, 3);
+		break;
+	case 4:
+	case 5:
+	case 6:
+		GLfloat filter[25];
+		for (int i = 0; i < 5; i++) for (int j = 0; j < 5; j++) {
+			filter[5 * j + i] = bgRectangle[i] * bgRectangle[j];
+		}
+		glUniform1fv(filterKernelLoc, 25, filter);
+		glUniform1i(kSizeLoc, 5);
+		break;
+	default:
+		break;
+	}
+}
+
+void Scene::selectForeground(int idx) {
+	fgTexture = foregrounds[idx];
+}
+
+void Scene::selectBackground(int idx) {
+	bgTexture = backgrounds[idx];
+}
+
+std::vector<GLfloat> Scene::gaussian1D(int n) {
+	std::vector<GLfloat> ret(n);
+	// assumes sigma = 1
+	double area = std::erf(n / 2.0 / std::sqrt(2));
+	for (int i = 0; i <= n / 2; i++) {
+		double u = (i + 0.5) / std::sqrt(2);
+		double l = (i - 0.5) / std::sqrt(2);
+		ret[n / 2 + i] = ret[n / 2 - i] =
+			(GLfloat)(0.5 * (std::erf(u) - std::erf(l)) / area);
+	}
+	return ret;
+}
+

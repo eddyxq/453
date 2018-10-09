@@ -13,7 +13,12 @@
 #include "ShaderTools.h"
 
 RenderingEngine::RenderingEngine() {
-	shaderProgram = ShaderTools::InitializeShaders();
+	const std::string FG_VERTEX_SHADER = "../shaders/fg_vertex.glsl";
+	const std::string FG_FRAGMENT_SHADER = "../shaders/fg_square_fragment.glsl";
+	const std::string BG_VERTEX_SHADER = "../shaders/bg_vertex.glsl";
+	const std::string BG_FRAGMENT_SHADER = "../shaders/bg_fragment.glsl";
+	shaderProgram = ShaderTools::InitializeShaders(FG_VERTEX_SHADER, FG_FRAGMENT_SHADER);
+	shaderProgram2 = ShaderTools::InitializeShaders(BG_VERTEX_SHADER, BG_FRAGMENT_SHADER);
 	if (shaderProgram == 0) {
 		std::cout << "Program could not initialize shaders, TERMINATING" << std::endl;
 		return;
@@ -34,10 +39,23 @@ RenderingEngine::~RenderingEngine() {
 
 }
 
-void RenderingEngine::RenderScene(const std::vector<Geometry>& objects) {
-	//Clears the screen to a dark grey background
+void RenderingEngine::RenderBackground(Geometry& bg) {
+	glEnable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	glUseProgram(shaderProgram2);
+
+	assignBuffers(bg);
+	setBufferData(bg);
+	glBindVertexArray(bg.vao);
+	glDrawArrays(bg.drawMode, 0, bg.verts.size());
+	glBindVertexArray(0);
+}
+
+void RenderingEngine::RenderScene(const std::vector<Geometry>& objects) {
 
 	// bind our shader program and the vertex array object containing our
 	// scene geometry, then tell OpenGL to draw our geometry

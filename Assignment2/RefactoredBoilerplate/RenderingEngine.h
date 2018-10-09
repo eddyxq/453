@@ -25,6 +25,7 @@ public:
 
 	//Renders each object
 	void RenderScene(const std::vector<Geometry>& objects);
+	void RenderBackground(Geometry& bg);
 
 	//Create vao and vbos for objects
 	static void assignBuffers(Geometry& geometry);
@@ -36,6 +37,8 @@ public:
 
 	//Pointer to the current shader program being used to render
 	GLuint shaderProgram;
+	GLuint shaderProgram2;
+
 	GLuint scale;
 	float zoom;
 	GLuint x;

@@ -86,10 +86,10 @@ GLuint ShaderTools::LinkProgram(GLuint vertexShader, GLuint fragmentShader) {
 	return programObject;
 }
 
-GLuint ShaderTools::InitializeShaders() {
+GLuint ShaderTools::InitializeShaders(const std::string vsFile, const std::string fsFile) {
 	// load shader source from files
-	std::string vertexSource = LoadSource("../shaders/fg_vertex.glsl");
-	std::string fragmentSource = LoadSource("../shaders/fragment.glsl");
+	std::string vertexSource = LoadSource(vsFile);
+	std::string fragmentSource = LoadSource(fsFile);
 	if (vertexSource.empty() || fragmentSource.empty()) return false;
 
 	// compile shader source into shader objects

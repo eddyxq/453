@@ -23,7 +23,7 @@ bool changeImage;
 RenderingEngine* renderer;
 
 Program::Program() {
-
+	selectionState = SelectionState::NONE;
 	setupWindow();
 }
 
@@ -44,10 +44,10 @@ void Program::start() {
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-		if (changeImage) {
+		/*if (changeImage) {
 			scene->refresh(num);
 			changeImage = false;
-		}
+		}*/
 	}
 }
 
@@ -76,6 +76,7 @@ void Program::setupWindow() {
 		return;
 	}
 
+	glfwSetWindowUserPointer(window, this);
 	//Set the custom function that tracks key presses
 	glfwSetKeyCallback(window, KeyCallback);
 
@@ -121,43 +122,112 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
+
+	Program* program = (Program*)glfwGetWindowUserPointer(window);
+	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+		std::cout << "Please press 1-7 to select a foreground image.\n";
+		program->selectionState = Program::SelectionState::FOREGROUND;
+	}
+	if (key == GLFW_KEY_B && action == GLFW_PRESS) {
+		std::cout << "Please press 1-6 to select a background image.\n";
+		program->selectionState = Program::SelectionState::BACKGROUND;
+	}
+	if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+		std::cout << "Please press 1-4 to select a color effect.\n";
+		program->selectionState = Program::SelectionState::COLOR_EFFECT;
+	}
+	if (key == GLFW_KEY_T && action == GLFW_PRESS) {
+		std::cout << "Please press 1-7 to select a filter.\n";
+		program->selectionState = Program::SelectionState::FILTER;
+	}
 	//press number keys from 1 to 7 to display each of the 7 images
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-		num = 1;
-		changeImage = true;
-		renderer->l = 0;
+		if (program->selectionState == Program::SelectionState::FOREGROUND) {
+			// num = 1;
+			// changeImage = true;
+			program->getScene()->selectForeground(0);
+			renderer->l = 0;
+		}
+		else if (program->selectionState == Program::SelectionState::BACKGROUND) {
+			program->getScene()->selectBackground(0);
+		}
+		else if (program->selectionState == Program::SelectionState::FILTER) {
+			program->getScene()->selectFilter(0);
+		}
 	}
 	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-		num = 2;
-		changeImage = true;
-		renderer->l = 0;
+		if (program->selectionState == Program::SelectionState::FOREGROUND) {
+			// num = 2;
+			// changeImage = true;
+			program->getScene()->selectForeground(1);
+			renderer->l = 0;
+		}
+		else if (program->selectionState == Program::SelectionState::BACKGROUND) {
+			program->getScene()->selectBackground(1);
+		}
+		else if (program->selectionState == Program::SelectionState::FILTER) {
+			program->getScene()->selectFilter(1);
+		}
 	}
 	if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
-		num = 3;
-		changeImage = true;
-		renderer->l = 0;
+		if (program->selectionState == Program::SelectionState::FOREGROUND) {
+			// num = 2;
+			// changeImage = true;
+			program->getScene()->selectForeground(2);
+			renderer->l = 0;
+		}
+		else if (program->selectionState == Program::SelectionState::BACKGROUND) {
+			program->getScene()->selectBackground(2);
+		}
+		else if (program->selectionState == Program::SelectionState::FILTER) {
+			program->getScene()->selectFilter(2);
+		}
 	}
 	if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
-		num = 4;
-		changeImage = true;
-		renderer->l = 0;
+		if (program->selectionState == Program::SelectionState::FOREGROUND) {
+			// num = 2;
+			// changeImage = true;
+			program->getScene()->selectForeground(3);
+			renderer->l = 0;
+		}
+		else if (program->selectionState == Program::SelectionState::FILTER) {
+			program->getScene()->selectFilter(3);
+		}
 	}
 	if (key == GLFW_KEY_5 && action == GLFW_PRESS) {
-		num = 5;
-		changeImage = true;
-		renderer->l = 0;
+		if (program->selectionState == Program::SelectionState::FOREGROUND) {
+			// num = 2;
+			// changeImage = true;
+			program->getScene()->selectForeground(4);
+			renderer->l = 0;
+		}
+		else if (program->selectionState == Program::SelectionState::FILTER) {
+			program->getScene()->selectFilter(4);
+		}
 	}
 	if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
-		num = 6;
-		changeImage = true;
-		renderer->l = 0;
+		if (program->selectionState == Program::SelectionState::FOREGROUND) {
+			// num = 2;
+			// changeImage = true;
+			program->getScene()->selectForeground(5);
+			renderer->l = 0;
+		}
+		else if (program->selectionState == Program::SelectionState::FILTER) {
+			program->getScene()->selectFilter(5);
+		}
 	}
 	if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
-		num = 7;
-		changeImage = true;
-		renderer->l = 0;
+		if (program->selectionState == Program::SelectionState::FOREGROUND) {
+			// num = 2;
+			// changeImage = true;
+			program->getScene()->selectForeground(6);
+			renderer->l = 0;
+		}
+		else if (program->selectionState == Program::SelectionState::FILTER) {
+			program->getScene()->selectFilter(6);
+		}
 	}
-	//press number keys 8, 9, 0 to apply shaders
+	//press number keys 8, 9, 0 to apply color tone
 	if (key == GLFW_KEY_8 && action == GLFW_PRESS) 
 	{
 		renderer->l = 1;
