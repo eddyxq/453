@@ -17,9 +17,6 @@
 #include "RenderingEngine.h"
 #include "Scene.h"
 
-int num;
-bool changeImage;
-
 RenderingEngine* renderer;
 
 Program::Program() {
@@ -37,17 +34,11 @@ void Program::start() {
 	renderingEngine = new RenderingEngine();
 	scene = new Scene(renderingEngine);
 	renderer = renderingEngine;
-	//num = scene->getImageNum();
 	//Main render loop
 	while (!glfwWindowShouldClose(window)) {
 		scene->displayScene();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
-		/*if (changeImage) {
-			scene->refresh(num);
-			changeImage = false;
-		}*/
 	}
 }
 
@@ -79,13 +70,10 @@ void Program::setupWindow() {
 	glfwSetWindowUserPointer(window, this);
 	//Set the custom function that tracks key presses
 	glfwSetKeyCallback(window, KeyCallback);
-
 	//Set the custom function that tracks scroll wheel 
 	glfwSetScrollCallback(window, scroll_callback);
-
 	//Set the custom function that tracks cursor position 
 	glfwSetCursorPosCallback(window, cursor_position_callback);
-
 	//Bring the new window to the foreground (not strictly necessary but convenient)
 	glfwMakeContextCurrent(window);
 
@@ -98,8 +86,6 @@ void Program::setupWindow() {
 	//Query and print out information about our OpenGL environment
 	QueryGLVersion();
 }
-
-
 
 void Program::QueryGLVersion() {
 	// query opengl version and renderer information
@@ -122,7 +108,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
-
 	Program* program = (Program*)glfwGetWindowUserPointer(window);
 	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
 		std::cout << "Please press 1-7 to select a foreground image.\n";
@@ -143,8 +128,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	//press number keys from 1 to 7 to display each of the 7 images
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
 		if (program->selectionState == Program::SelectionState::FOREGROUND) {
-			// num = 1;
-			// changeImage = true;
 			program->getScene()->selectForeground(0);
 			renderer->l = 0;
 		}
@@ -157,8 +140,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
 		if (program->selectionState == Program::SelectionState::FOREGROUND) {
-			// num = 2;
-			// changeImage = true;
 			program->getScene()->selectForeground(1);
 			renderer->l = 0;
 		}
@@ -171,8 +152,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
 		if (program->selectionState == Program::SelectionState::FOREGROUND) {
-			// num = 2;
-			// changeImage = true;
 			program->getScene()->selectForeground(2);
 			renderer->l = 0;
 		}
@@ -185,8 +164,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
 		if (program->selectionState == Program::SelectionState::FOREGROUND) {
-			// num = 2;
-			// changeImage = true;
 			program->getScene()->selectForeground(3);
 			renderer->l = 0;
 		}
@@ -196,8 +173,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	if (key == GLFW_KEY_5 && action == GLFW_PRESS) {
 		if (program->selectionState == Program::SelectionState::FOREGROUND) {
-			// num = 2;
-			// changeImage = true;
 			program->getScene()->selectForeground(4);
 			renderer->l = 0;
 		}
@@ -207,8 +182,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
 		if (program->selectionState == Program::SelectionState::FOREGROUND) {
-			// num = 2;
-			// changeImage = true;
 			program->getScene()->selectForeground(5);
 			renderer->l = 0;
 		}
@@ -218,8 +191,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
 		if (program->selectionState == Program::SelectionState::FOREGROUND) {
-			// num = 2;
-			// changeImage = true;
 			program->getScene()->selectForeground(6);
 			renderer->l = 0;
 		}
@@ -228,32 +199,26 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		}
 	}
 	//press number keys 8, 9, 0 to apply color tone
-	if (key == GLFW_KEY_8 && action == GLFW_PRESS) 
-	{
+	if (key == GLFW_KEY_8 && action == GLFW_PRESS) {
 		renderer->l = 1;
 	}
-	if (key == GLFW_KEY_9 && action == GLFW_PRESS) 
-	{
+	if (key == GLFW_KEY_9 && action == GLFW_PRESS) {
 		renderer->l = 2;
 	}
-	if (key == GLFW_KEY_0 && action == GLFW_PRESS) 
-	{
+	if (key == GLFW_KEY_0 && action == GLFW_PRESS) {
 		renderer->l = 3;
 	}
 	//press s to apply a sepia tone
-	if (key == GLFW_KEY_S && action == GLFW_PRESS)
-	{
+	if (key == GLFW_KEY_S && action == GLFW_PRESS){
 		renderer->l = 4;
 	}
 	//press a to rotate counter clockwise
-	if (key == GLFW_KEY_A && action == GLFW_PRESS) 
-	{
+	if (key == GLFW_KEY_A && action == GLFW_PRESS) {
 		program->getScene()->updateVertices(0.0f, 0.0f, -18.0f);
 		program->getScene()->stopVerticesUpdate();
 	}
 	//press a to rotate clockwise
-	if (key == GLFW_KEY_D && action == GLFW_PRESS) 
-	{
+	if (key == GLFW_KEY_D && action == GLFW_PRESS) {
 		program->getScene()->updateVertices(0.0f, 0.0f, 18.0f);
 		program->getScene()->stopVerticesUpdate();
 	}
@@ -263,45 +228,37 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	Program* program = (Program*)glfwGetWindowUserPointer(window);
 	//scroll forward to zoom in
-	if (yoffset == 1) 
-	{
+	if (yoffset == 1) {
 		if (renderer->zoom < 3.0f) {
 			renderer->zoom += 0.1f;
 			program->getScene()->updateZoom(renderer->zoom);
 		}
 	}
 	//scroll backward to zoom out
-	else if (yoffset == -1)
-	{
+	else if (yoffset == -1){
 		if (renderer->zoom > 0.5f) {
 			renderer->zoom -= 0.1f;
 			program->getScene()->updateZoom(renderer->zoom);
 		}
 	}
 }
-
 double rx;
 double ry;
-
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	Program* program = (Program*)glfwGetWindowUserPointer(window);
 	GLboolean leftDown;
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-	{
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
 		leftDown = true;
 	}
-	else 
-	{
+	else {
 		leftDown = false;
 	}
-	if (!(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
-	{
+	if (!(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)){
 		rx = xpos;
 		ry = ypos;
 	}
-	if (leftDown)
-	{
+	if (leftDown){
 		program->getScene()->updateVertices((xpos-rx) / 256, (ypos - ry) / -256, 0.0f);
 	}
 	else {

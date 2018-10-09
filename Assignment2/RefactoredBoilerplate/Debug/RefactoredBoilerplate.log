@@ -1,5 +1,7 @@
 ﻿  Program.cpp
 c:\users\eddy\desktop\github\453\assignment2\refactoredboilerplate\renderingengine.h(19): warning C4099: 'GLFWwindow': type name first seen using 'struct' now seen using 'class'
   c:\users\eddy\desktop\github\453\assignment2\middleware\glfw\include\glfw\glfw3.h(789): note: see declaration of 'GLFWwindow'
-c:\users\eddy\desktop\github\453\assignment2\refactoredboilerplate\program.cpp(305): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\eddy\desktop\github\453\assignment2\refactoredboilerplate\program.cpp(270): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\eddy\desktop\github\453\assignment2\refactoredboilerplate\program.cpp(271): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\eddy\desktop\github\453\assignment2\refactoredboilerplate\program.cpp(274): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   RefactoredBoilerplate.vcxproj -> C:\Users\eddy\Desktop\GitHub\453\Assignment2\Debug\RefactoredBoilerplate.exe
