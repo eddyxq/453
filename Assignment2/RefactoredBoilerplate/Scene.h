@@ -25,9 +25,9 @@ public:
 	//Send geometry to the renderer
 	void displayScene();
 
-	void switchScene(int idx);
-
-	void updateBackground(int idx);
+	void selectFilter(int idx);
+	void selectForeground(int idx);
+	void selectBackground(int idx);
 
 private:
 	RenderingEngine* renderer;
@@ -57,20 +57,29 @@ private:
 		0.0f, -1.0f, 0.0f,
 	};
 
-	const char* const FG_IMG1 = "image1-mandrill.png";
-	const char* const FG_IMG2 = "image2-uclogo.png";
-	const char* const FG_IMG3 = "image3-aerial.png";
-	const char* const FG_IMG4 = "image4-thirsk.png";
-	const char* const FG_IMG5 = "image5-pattern.png";
-	const char* const FG_IMG6 = "image6-bubble.png";
-	const char* const BG_IMG1 = "background1-asphalt.jpg";
-	const char* const BG_IMG2 = "background2-marble.jpg";
-	const char* const BG_IMG3 = "background3-wood.jpg";
+	std::string FG_IMG1 = "image1-mandrill.png";
+	std::string FG_IMG2 = "image2-uclogo.png";
+	std::string FG_IMG3 = "image3-aerial.png";
+	std::string FG_IMG4 = "image4-thirsk.png";
+	std::string FG_IMG5 = "image5-pattern.png";
+	std::string FG_IMG6 = "image6-bubble.png";
+	std::string BG_IMG1 = "background1-asphalt.jpg";
+	std::string BG_IMG2 = "background2-marble.jpg";
+	std::string BG_IMG3 = "background3-wood.jpg";
 
 	std::vector<GLfloat> gaussian1D(int n);
 
 	MyTexture fgTexture;
 	MyTexture bgTexture;
+
+	int sceneIdx;
+
+	const std::vector<std::string> fgImages = { FG_IMG1, FG_IMG2, FG_IMG3, FG_IMG4, FG_IMG5, FG_IMG6 };
+	const std::vector<std::string> bgImages = { BG_IMG1, BG_IMG2, BG_IMG3 };
+	std::vector<MyTexture> foregrounds;
+	std::vector<MyTexture> backgrounds;
+
+	void selectFilter();
 };
 
 #endif /* SCENE_H_ */

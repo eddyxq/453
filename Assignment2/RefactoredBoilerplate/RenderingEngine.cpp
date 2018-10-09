@@ -15,8 +15,8 @@
 #include "texture.h"
 
 RenderingEngine::RenderingEngine() {
-	shaderProgram = ShaderTools::InitializeShaders("../shaders/fragment.glsl");
-	shaderProgram2 = ShaderTools::InitializeShaders("../shaders/fragment2.glsl");
+	shaderProgram = ShaderTools::InitializeShaders("../shaders/square_filter_kernel.glsl");
+	shaderProgram2 = ShaderTools::InitializeShaders("../shaders/bg_fragment.glsl");
 	if (shaderProgram == 0) {
 		std::cout << "Program could not initialize shaders, TERMINATING" << std::endl;
 		return;
@@ -81,20 +81,16 @@ void RenderingEngine::assignBuffers(Geometry& geometry) {
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(2);*/
 
-	if (!geometry.colors.empty()) {
-		glGenBuffers(1, &geometry.colorBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, geometry.colorBuffer);
-		//Parameters in order: Index of vbo in the vao, number of primitives per element, primitive type, etc.
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glEnableVertexAttribArray(1);
-	}
+	/*glGenBuffers(1, &geometry.colorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, geometry.colorBuffer);
+	//Parameters in order: Index of vbo in the vao, number of primitives per element, primitive type, etc.
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(1);*/
 
 	glGenBuffers(1, &geometry.uvBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, geometry.uvBuffer);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(1);
-
-
 }
 
 void RenderingEngine::setBufferData(Geometry& geometry) {

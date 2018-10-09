@@ -32,11 +32,13 @@ public:
 		return scene;
 	}
 
+	enum SelectionState { NONE, BACKGROUND, FOREGROUND, FILTER };
+	SelectionState selectionState;
+
 private:
 	GLFWwindow * window;
 	RenderingEngine* renderingEngine;
 	Scene* scene;
-
 };
 
 //Functions passed to GLFW to handle errors and keyboard input

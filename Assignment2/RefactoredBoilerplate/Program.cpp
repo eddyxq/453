@@ -107,13 +107,36 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 	Program* program = (Program*)glfwGetWindowUserPointer(window);
+	if (key == GLFW_KEY_B) {
+		program->selectionState = Program::SelectionState::BACKGROUND;
+		std::cout << "Please press a number between 1 to 3 to select a background.\n";
+	}
+	if (key == GLFW_KEY_F) {
+		program->selectionState = Program::SelectionState::FILTER;
+		std::cout << "Please press a number between 1 to 5 to select a filter.\n";
+	}
+	if (key == GLFW_KEY_B) {
+		program->selectionState = Program::SelectionState::BACKGROUND;
+	}
+	if (key == GLFW_KEY_0 && action == GLFW_PRESS) {
+		program->getScene()->selectFilter(0);
+	}
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-		program->getScene()->switchScene(1);
+		program->getScene()->selectFilter(1);
 	}
 	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-		program->getScene()->switchScene(2);
+		program->getScene()->selectFilter(2);
 	}
 	if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
-		program->getScene()->switchScene(3);
+		program->getScene()->selectFilter(3);
+	}
+	if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
+		program->getScene()->selectFilter(4);
+	}
+	if (key == GLFW_KEY_5 && action == GLFW_PRESS) {
+		program->getScene()->selectBackground(1);
+	}
+	if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
+		program->getScene()->selectBackground(2);
 	}
 }
