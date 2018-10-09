@@ -34,7 +34,7 @@ Scene::Scene(RenderingEngine* renderer) : renderer(renderer), sceneIdx(1) {
 		InitializeTexture(&texture, file.c_str(), GL_TEXTURE_RECTANGLE);
 		backgrounds.push_back(texture);
 	}
-	fgTexture = foregrounds[0];
+	fgTexture = foregrounds[1];
 	bgTexture = backgrounds[2];
 }
 
