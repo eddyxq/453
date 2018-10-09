@@ -59,12 +59,12 @@ void Scene::displayScene() {
 	GLuint bgLoc = glGetUniformLocation(renderer->shaderProgram2, "bgTexture");
 	glUniform1i(bgLoc, 0);
 
-	bgRectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
-	bgRectangle.verts.push_back(glm::vec3(0.9f, -0.9f, 1.0f));
-	bgRectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
-	bgRectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
-	bgRectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
-	bgRectangle.verts.push_back(glm::vec3(-0.9f, 0.9f, 1.0f));
+	bgRectangle.verts.push_back(glm::vec3(-1.0f, -1.0f, 1.0f));
+	bgRectangle.verts.push_back(glm::vec3(1.0f, -1.0f, 1.0f));
+	bgRectangle.verts.push_back(glm::vec3(1.0f, 1.0f, 1.0f));
+	bgRectangle.verts.push_back(glm::vec3(-1.0f, -1.0f, 1.0f));
+	bgRectangle.verts.push_back(glm::vec3(1.0f, 1.0f, 1.0f));
+	bgRectangle.verts.push_back(glm::vec3(-1.0f, 1.0f, 1.0f));
 
 	bgRectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
 	bgRectangle.uvs.push_back(glm::vec2(float(bgTexture.width), 0.f));
@@ -85,12 +85,24 @@ void Scene::displayScene() {
 	GLuint fgLoc = glGetUniformLocation(renderer->shaderProgram, "fgTexture");
 	glUniform1i(fgLoc, 1);
 
-	fgRectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
-	fgRectangle.verts.push_back(glm::vec3(0.9f, -0.9f, 1.0f));
-	fgRectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
-	fgRectangle.verts.push_back(glm::vec3(-0.9f, -0.9f, 1.0f));
-	fgRectangle.verts.push_back(glm::vec3(0.9f, 0.9f, 1.0f));
-	fgRectangle.verts.push_back(glm::vec3(-0.9f, 0.9f, 1.0f));
+	if (fgTexture.width <= fgTexture.height) {
+		float ratio = float(fgTexture.width) / float(fgTexture.height);
+		fgRectangle.verts.push_back(glm::vec3(ratio * -1.0f, -1.0f, 1.0f));
+		fgRectangle.verts.push_back(glm::vec3(ratio * 1.0f, -1.0f, 1.0f));
+		fgRectangle.verts.push_back(glm::vec3(ratio * 1.0f, 1.0f, 1.0f));
+		fgRectangle.verts.push_back(glm::vec3(ratio * -1.0f, -1.0f, 1.0f));
+		fgRectangle.verts.push_back(glm::vec3(ratio * 1.0f, 1.0f, 1.0f));
+		fgRectangle.verts.push_back(glm::vec3(ratio * -1.0f, 1.0f, 1.0f));
+	}
+	else {
+		float ratio = float(fgTexture.height) / float(fgTexture.width);
+		fgRectangle.verts.push_back(glm::vec3(-1.0f, ratio * -1.0f, 1.0f));
+		fgRectangle.verts.push_back(glm::vec3(1.0f, ratio * -1.0f, 1.0f));
+		fgRectangle.verts.push_back(glm::vec3(1.0f, ratio * 1.0f, 1.0f));
+		fgRectangle.verts.push_back(glm::vec3(-1.0f, ratio * -1.0f, 1.0f));
+		fgRectangle.verts.push_back(glm::vec3(1.0f, ratio * 1.0f, 1.0f));
+		fgRectangle.verts.push_back(glm::vec3(-1.0f, ratio * 1.0f, 1.0f));
+	}
 
 	fgRectangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
 	fgRectangle.uvs.push_back(glm::vec2(float(fgTexture.width), 0.f));
