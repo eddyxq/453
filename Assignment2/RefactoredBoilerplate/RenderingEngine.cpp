@@ -18,10 +18,16 @@ RenderingEngine::RenderingEngine() {
 		std::cout << "Program could not initialize shaders, TERMINATING" << std::endl;
 		return;
 	}
-	time = 1;
-	location = glGetUniformLocation(shaderProgram, "time");
-	time++;
-
+	zoom = 1;
+	cursor_x = 0;
+	cursor_y = 0;
+	degree = 0;
+	l = 0;
+	scale = glGetUniformLocation(shaderProgram, "zoom");
+	x = glGetUniformLocation(shaderProgram, "cursor_x");
+	y = glGetUniformLocation(shaderProgram, "cursor_y");
+	rotation = glGetUniformLocation(shaderProgram, "degree");
+	luminance = glGetUniformLocation(shaderProgram, "l");
 }
 
 RenderingEngine::~RenderingEngine() {
@@ -37,7 +43,11 @@ void RenderingEngine::RenderScene(const std::vector<Geometry>& objects) {
 	// scene geometry, then tell OpenGL to draw our geometry
 	glUseProgram(shaderProgram);
 
-	glUniform1i(location, time);
+	glUniform1f(scale, zoom);
+	glUniform1f(x, cursor_x);
+	glUniform1f(y, cursor_y);
+	glUniform1f(rotation, degree);
+	glUniform1f(luminance, l);
 
 	for (const Geometry& g : objects) {
 		glBindVertexArray(g.vao);
