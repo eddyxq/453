@@ -30,7 +30,8 @@ public:
 	void selectForeground(int idx);
 	void selectBackground(int idx);
 
-	void updateVertices(float dx, float dy, float degree);
+	void updateVertices(float dx, float dy);
+	void rotateForeground(float degree);
 	void stopVerticesUpdate();
 	void updateZoom(float zoom);
 
@@ -90,7 +91,7 @@ private:
 	std::vector<glm::vec3> fgVertices;
 	std::vector<glm::vec3> bgVertices;
 
-	float prevX, prevY, prevDeg, prevZoom = 1.0f;
+	float prevX, prevY, prevZoom = 1.0f;
 };
 
 #endif /* SCENE_H_ */

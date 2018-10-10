@@ -1,8 +1,8 @@
 |--------------------------------------|
-| 	CPSC 453: Assignment 1         |
+| 	CPSC 453: Assignment 2         |
 | 	     Completed By:             |
 | NAME  Eddy Qiang  &  Tony Cai        |
-| ID    (30058191)     (        )      |
+| ID    (30058191)     (10151535)      |
 |--------------------------------------|
 
 Built with the Windows Visual Studio boilerplate.
@@ -33,15 +33,20 @@ Press the a number key from 1 to 3 to apply each background:
 3 - wood
 
 Press T to select filter
-Press the a number key from 1 to 3 to apply each filter:
-1 - vertical sobel
-2 - horizontal sobel
-3 - unsharp mask
+Press the a number key from 1 to 7 to apply each filter:
+1 - identity (no filter)
+2 - vertical sobel
+3 - horizontal sobel
+4 - unsharp mask
+5 - 3x3 Gaussian
+6 - 5x5 Gaussian
+7 - 7x7 Gaussian
 
-For grey scale color change, press 8, 9, or 0:
+For grey scale color change, press 8, 9, 0, or S:
 8 - L1
 9 - L2
 0 - L3
+S - sepia tone
 
 
 

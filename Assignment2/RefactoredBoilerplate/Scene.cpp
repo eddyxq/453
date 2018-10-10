@@ -104,17 +104,22 @@ void Scene::displayScene() {
 	renderer->RenderScene({ fgRectangle });
 }
 
-void Scene::updateVertices(float x, float y, float degree) {
-	const double PI = std::atan(1) * 4;
+void Scene::updateVertices(float x, float y) {
 	for (glm::vec3& v : fgVertices) {
 		v.x += x - prevX;
 		v.y += y - prevY;
+	}
+	prevX = x, prevY = y;
+}
+
+void Scene::rotateForeground(float degree) {
+	const double PI = std::atan(1) * 4;
+	for (glm::vec3& v : fgVertices) {
 		float cx = v.x, cy = v.y;
-		double angle = PI * (degree - prevDeg) / 180.0f;
+		double angle = PI * degree / 180.0f;
 		v.y = std::sin(angle)*cx + std::cos(angle)*cy;
 		v.x = std::cos(angle)*cx - std::sin(angle)*cy;
 	}
-	prevX = x, prevY = y, prevDeg = degree;
 }
 
 void Scene::updateZoom(float zoom) {
@@ -126,7 +131,7 @@ void Scene::updateZoom(float zoom) {
 }
 
 void Scene::stopVerticesUpdate() {
-	prevX = 0.0f, prevY = 0.0f, prevDeg = 0.0f;
+	prevX = 0.0f, prevY = 0.0f;
 }
 
 void Scene::selectFilter(int idx) {

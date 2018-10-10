@@ -214,13 +214,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	//press a to rotate counter clockwise
 	if (key == GLFW_KEY_A && action == GLFW_PRESS) {
-		program->getScene()->updateVertices(0.0f, 0.0f, -18.0f);
-		program->getScene()->stopVerticesUpdate();
+		program->getScene()->rotateForeground(15.0f);
 	}
 	//press a to rotate clockwise
 	if (key == GLFW_KEY_D && action == GLFW_PRESS) {
-		program->getScene()->updateVertices(0.0f, 0.0f, 18.0f);
-		program->getScene()->stopVerticesUpdate();
+		program->getScene()->rotateForeground(-15.0f);
 	}
 }
 
@@ -259,7 +257,7 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 		ry = ypos;
 	}
 	if (leftDown){
-		program->getScene()->updateVertices((xpos-rx) / 256, (ypos - ry) / -256, 0.0f);
+		program->getScene()->updateVertices((xpos-rx) / 256, (ypos - ry) / -256);
 	}
 	else {
 		program->getScene()->stopVerticesUpdate();
