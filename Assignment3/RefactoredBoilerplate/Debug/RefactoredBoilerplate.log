@@ -1,17 +1,2 @@
-﻿  glad.c
-  Geometry.cpp
-  GlyphExtractor.cpp
-  main.cpp
-  Program.cpp
-c:\users\eddy\desktop\github\453\assignment3\middleware\glfw\include\glfw\glfw3.h(789): warning C4099: 'GLFWwindow': type name first seen using 'class' now seen using 'struct'
-  c:\users\eddy\desktop\github\453\assignment3\refactoredboilerplate\program.h(13): note: see declaration of 'GLFWwindow'
-  RenderingEngine.cpp
-c:\users\eddy\desktop\github\453\assignment3\refactoredboilerplate\renderingengine.h(19): warning C4099: 'GLFWwindow': type name first seen using 'struct' now seen using 'class'
-  c:\users\eddy\desktop\github\453\assignment3\middleware\glfw\include\glfw\glfw3.h(789): note: see declaration of 'GLFWwindow'
-  Scene.cpp
-c:\users\eddy\desktop\github\453\assignment3\refactoredboilerplate\renderingengine.h(19): warning C4099: 'GLFWwindow': type name first seen using 'struct' now seen using 'class'
-  c:\users\eddy\desktop\github\453\assignment3\middleware\glfw\include\glfw\glfw3.h(789): note: see declaration of 'GLFWwindow'
-  ShaderTools.cpp
-  Generating Code...
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
-  RefactoredBoilerplate.vcxproj -> C:\Users\eddy\Desktop\GitHub\453\Assignment3\Debug\RefactoredBoilerplate.exe
+﻿  Scene.cpp
+  RefactoredBoilerplate.vcxproj -> C:\Users\Eddy\Desktop\CPSC453-Assignment3-4bd3a567c8aff2aa51b59b1d3215dc6ce83a5a75\CPSC453-Assignment3-4bd3a567c8aff2aa51b59b1d3215dc6ce83a5a75\Debug\RefactoredBoilerplate.exe

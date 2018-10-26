@@ -1,36 +1,23 @@
-/*
- * ShaderTools.cpp
- *	Tools for parsing, compiling and linking shaders
- *  Created on: Sep 10, 2018
- *      Author: John Hall
- */
-
 #include "ShaderTools.h"
-
 #include <iostream>
 #include <fstream>
 #include <string>
-
-//**Must include glad and GLFW in this order or it breaks**
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-//Shader associated functions are put in the ShaderTools namespace
-
 std::string ShaderTools::LoadSource(const std::string &filename) {
 	std::string source;
-
 	std::ifstream input(filename.c_str());
 	if (input) {
 		std::copy(std::istreambuf_iterator<char>(input),
 				std::istreambuf_iterator<char>(),
 				back_inserter(source));
 		input.close();
-	} else {
+	} 
+	else {
 		std::cout << "ERROR: Could not load shader source from file "
 				<< filename << std::endl;
 	}
-
 	return source;
 }
 
@@ -56,7 +43,6 @@ GLuint ShaderTools::CompileShader(GLenum shaderType, const std::string &source) 
 		std::cout << source << std::endl;
 		std::cout << info << std::endl;
 	}
-
 	return shaderObject;
 }
 
@@ -85,7 +71,6 @@ GLuint ShaderTools::LinkProgram(GLuint vertexShader, GLuint fragmentShader, GLui
 		std::cout << "ERROR linking shader program:" << std::endl;
 		std::cout << info << std::endl;
 	}
-
 	return programObject;
 }
 
@@ -105,6 +90,32 @@ GLuint ShaderTools::InitializeShaders() {
 
 	// link shader program
 	GLuint program = LinkProgram(vertex, fragment, tcs, tes);
+
+	glDeleteShader(vertex);
+	glDeleteShader(fragment);
+	glDeleteShader(tcs);
+	glDeleteShader(tes);
+
+	// check for OpenGL errors and return false if error occurred
+	return program;
+}
+
+GLuint ShaderTools::InitializeShaders2() {
+	// load shader source from files
+	std::string vertexSource = LoadSource("../shaders/vertex.glsl");
+	std::string fragmentSource = LoadSource("../shaders/fragment.glsl");
+	std::string tcsSource = LoadSource("../shaders/tessControl.glsl");
+	std::string tesSource = LoadSource("../shaders/tessEval.glsl");
+	if (vertexSource.empty() || fragmentSource.empty() || tcsSource.empty() || tesSource.empty()) return false;
+
+	// compile shader source into shader objects
+	GLuint vertex = CompileShader(GL_VERTEX_SHADER, vertexSource);
+	GLuint fragment = CompileShader(GL_FRAGMENT_SHADER, fragmentSource);
+	GLuint tcs = CompileShader(GL_TESS_CONTROL_SHADER, tcsSource);
+	GLuint tes = CompileShader(GL_TESS_EVALUATION_SHADER, tesSource);
+
+	// link shader program
+	GLuint program = LinkProgram(vertex, fragment, 0, 0);
 
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);

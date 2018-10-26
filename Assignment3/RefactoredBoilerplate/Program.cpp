@@ -1,23 +1,13 @@
-/*
- * Program.cpp
- *
- *  Created on: Sep 10, 2018
- *      Author: John Hall
- */
-
 #include "Program.h"
-
 #include <iostream>
 #include <string>
-
-//**Must include glad and GLFW in this order or it breaks**
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include "RenderingEngine.h"
 #include "Scene.h"
 
 Scene* currentScene;
+RenderingEngine* renderer;
 
 Program::Program() {
 	setupWindow();
@@ -32,16 +22,13 @@ Program::~Program() {
 void Program::start() {
 	renderingEngine = new RenderingEngine();
 	scene = new Scene(renderingEngine);
-
 	currentScene = scene;
-
 	//Main render loop
 	while(!glfwWindowShouldClose(window)) {
 		scene->displayScene();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
 }
 
 void Program::setupWindow() {
@@ -57,6 +44,7 @@ void Program::setupWindow() {
 
 	//Attempt to create a window with an OpenGL 4.1 core profile context
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_SAMPLES, 4); // Anti-aliasing
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -80,12 +68,9 @@ void Program::setupWindow() {
 		std::cout << "GLAD init failed" << std::endl;
 		return;
 	}
-
 	//Query and print out information about our OpenGL environment
 	QueryGLVersion();
 }
-
-
 
 void Program::QueryGLVersion() {
 	// query opengl version and renderer information
@@ -105,7 +90,49 @@ void ErrorCallback(int error, const char* description) {
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	//Key codes are often prefixed with GLFW_KEY_ and can be found on the GLFW website
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (action == GLFW_PRESS) {
+		//Program *program = (Program*)glfwGetWindowUserPointer(window);
+		switch (key) {
+		case GLFW_KEY_ESCAPE:
+			glfwSetWindowShouldClose(window, GL_TRUE);
+			std::cout << "Exiting program." << std::endl;
+			break;
+		case GLFW_KEY_1: // Quadratic
+			std::cout << "Part I: Bezier Curves - Scene I" << std::endl;
+			//renderer->degree = 2;
+			currentScene->setScene(Scene::QUADRATIC);
+			break;
+		case GLFW_KEY_2: // Cubic
+			std::cout << "Part I: Bezier Curves - Scene II" << std::endl;
+			//renderer->degree = 3;
+			currentScene->setScene(Scene::CUBIC);
+			break;
+		case GLFW_KEY_3:
+			std::cout << "Part II: Rendering Fonts - Lora" << std::endl;
+			currentScene->setScene(Scene::LORA);
+			break;
+		case GLFW_KEY_4:
+			std::cout << "Part II: Rendering Fonts - Source Sans Pro" << std::endl;
+			currentScene->setScene(Scene::SOURCE_SANS_PRO);
+			break;
+		case GLFW_KEY_5:
+			std::cout << "Part II: Rendering Fonts - Comic Sans" << std::endl;
+			currentScene->setScene(Scene::COMIC_SANS);
+			break;
+		case GLFW_KEY_6:
+			std::cout << "Part III: Scrolling Text - Alex Brush" << std::endl;
+			currentScene->setScene(Scene::SCROLLING_ALEX_BRUSH);
+			break;
+		case GLFW_KEY_7:
+			std::cout << "Part III: Scrolling Text - Inconsolata" << std::endl;
+			currentScene->setScene(Scene::SCROLLING_INCONSOLATA);
+			break;
+		case GLFW_KEY_UP:
+			currentScene->speedUp();
+			break;
+		case GLFW_KEY_DOWN:
+			currentScene->speedDown();
+			break;
+		}
 	}
 }

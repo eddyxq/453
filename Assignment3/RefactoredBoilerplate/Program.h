@@ -1,15 +1,6 @@
-/*
- * Program.h
- *	Base class of a rendering program. Has a scene to render, a rendering engine and a window to render to.
- *  Created on: Sep 10, 2018
- *  Author: John Hall
- */
-
 #ifndef PROGRAM_H_
 #define PROGRAM_H_
 
-//Forward declaration of classes
-//(note this is necessary because these are pointers and it allows the #include to appear in the .cpp file)
 class GLFWwindow;
 class RenderingEngine;
 class Scene;
@@ -32,7 +23,6 @@ private:
 	GLFWwindow* window;
 	RenderingEngine* renderingEngine;
 	Scene* scene;
-
 };
 
 //Functions passed to GLFW to handle errors and keyboard input

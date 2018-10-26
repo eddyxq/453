@@ -1,0 +1,177 @@
+\documentclass[12p]{article}
+\usepackage[margin=1in, headheight=110pt]{geometry}
+\usepackage{amssymb, amsmath, amsfonts, amsthm}
+\usepackage{mathpazo}
+\usepackage{setspace}
+% \usepackage{probsoln}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{bookmark}
+
+\captionsetup{labelformat=empty}
+% \usepackage{parskip} % Use for extra line spacing
+\def\ojoin{\setbox0=\hbox{$\bowtie$}%
+  \rule[-.02ex]{.25em}{.4pt}\llap{\rule[\ht0]{.25em}{.4pt}}}
+\def\leftouterjoin{\mathbin{\ojoin\mkern-5.8mu\bowtie}}
+\def\rightouterjoin{\mathbin{\bowtie\mkern-5.8mu\ojoin}}
+\def\fullouterjoin{\mathbin{\ojoin\mkern-5.8mu\bowtie\mkern-5.8mu\ojoin}}
+
+\pagestyle{fancy}
+\lhead{Evan Quan 10154242 - Eddy Qiang 30058191}
+\rhead{CPSC 453 - Assignment 3 - T03 - Fall 2018}
+\title{Curves \& Splines}
+\date{\vspace{-12ex}}
+
+\newcommand{\sep}{\;}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{prop}[theorem]{Proposition}
+\newtheorem{cor}[theorem]{Corollary}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newcounter{problem}
+\newcounter{exercise}
+\newcounter{solution}
+\newcounter{question}
+
+\newcommand{\question}[3]{%
+\textbf{Question #1}: #2
+
+\textbf{Answer:} #3
+\vspace{6pt}
+}
+
+\setlength{\parindent}{0pt}
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\onehalfspacing
+
+\begin{center}
+  October 15, 2018
+\end{center}
+
+\section{B\'ezier Curves}
+\begin{enumerate}[label=\Alph*)]
+  \item
+  \begin{align*}
+    B(u) &= (1 - u)^2 \textbf{p}_0 + 2 (1 - u) \textbf{p}_1 + u^2 \textbf{p}_2 \\
+         &= (1 - 0.5)^2 \textbf{p}_0 + 2 (0.5)(1 - 0.5) \textbf{p}_1 + (0.5)^2 \textbf{p}_2 \\
+         &= \frac{1}{4} \textbf{p}_0 + \frac{1}{2} \textbf{p}_1 + \frac{1}{4} \textbf{p}_2 \\
+  \end{align*}
+  \begin{align*}
+    \textbf{p}_2 &= (1, 0), \textbf{p}_1 = (1, 1), \textbf{p}_2 = (0, 1) \\
+    x &= \frac{1}{4} (1) + \frac{1}{2} (1) + \frac{1}{4} (0) = 0.75 \\
+    y &= \frac{1}{4} (0) + \frac{1}{2} (1) + \frac{1}{4} (1) = 0.75
+  \end{align*}
+  \item The shape is a squircle, which approximates a circle. It is not quite a
+  circle since the radius is not constant.
+  \item
+  %% NOTE: 2nd attempt
+  The 4 control points are $\textbf{p}_0$, $\textbf{p}_1$, $\textbf{p}_2$ and $\textbf{p}_3$. Since we are
+  given the end points we know that $\textbf{p}_0 = (0, 1)$ and $\textbf{p}_1 = (1, 0)$. We are
+  also given the tangent of those points, so we know $\textbf{p}_1 = (x_1, 1)$ and $\textbf{p}_2 =
+  (1, y_2)$. Since this is a cubic B\'ezier and we are given the midpoint
+  $(\frac{\sqrt{2}}{2}, \frac{\sqrt{2}}{2})$, we know that $\frac{\sqrt{2}}{2}$
+  is the midpoint of of a midpoint of a midpoint. We can solve for $x_1$ albegraically:
+
+  \begin{align*}
+    \frac{\sqrt{2}}{2} = \frac{\Bigg(\bigg(\frac{\frac{0+x_1}{2} + \frac{x_1 + 1}{2}}{2}\bigg) + \bigg(\frac{\frac{1+1}{2} + \frac{1 + x_1}{2}}{2}\bigg)\Bigg)}{2}
+    % 2
+    % \frac{\sqrt{2}}{2}
+  \end{align*}
+  Solving for $x_1$, we get $x_1 = \frac{4\sqrt{2}}{3} - \frac{4}{3} = 0.55228$. Since this curve is symmetric about $y = x$, the reflected y value will be the same, therefore $y_2 = 0.55228$. Answer: the control points are (0, 1), (0.55228, 1), (01, 0.55228), (1, 0).
+
+
+
+  \item No, the curve does not perfectly form part of a circular arc, only approximate a circular arc. The equation is not exactly
+  equivalent to that of a circle as the radius is not constant.
+
+  \begin{align*}
+    u = \frac{2}{3}\\
+    p_x(\frac{2}{3}) &= (1 - \frac{2}{3})^3 p_{0,x} + 3(\frac{2}{3})(1 - \frac{2}{3})^2 p_{1,x} + 3 (\frac{2}{3})^2(1 - \frac{2}{3}) p_{2, x} + (\frac{2}{3})^3 p_{3, x} \\
+    &\approx 0.027(0) + 0.1889 (0.55223) + 0.441(1) + 0.343 (1)\\
+    % &= 0.8884\\
+    &= 0.863469 \dots \\
+    p_y(\frac{2}{3}) &= (1 - \frac{2}{3})^3 p_{0,y} + 3(\frac{2}{3})(1 - \frac{2}{3})^2 p_{1,y} + 3 (\frac{2}{3})^2(1 - \frac{2}{3}) p_{2, y} + (\frac{2}{3})^3 p_{3, y} \\
+    &\approx 0.027(1) + 0.1889 (1) + 0.441(0.55223) + 0.343 (0)\\
+    % &= 0.4596\\
+    &= 0.504717 \dots \\
+  \end{align*}
+  To calculate the radius:
+  \begin{align*}
+    r &= \sqrt{x^2 + y^2} \\
+    % &= \sqrt{0.8884^2 + 0.4596^2} \\
+    % &= 1.00021334
+    &= \sqrt{0.863469^2 + 0.504717^2} \\
+    &= 1.00015953 \\
+    & \neq 1
+  \end{align*}
+  This is close to, but not exactly 1, meaning that the arc is not that of a perfect
+  circle.
+  % To prove this, we can acquire the values at:
+  % TODO prove with theta = 0, 45, 30
+  \item
+    The four control points of the of the cubic B\'ezier that form a curve
+    identical to that in 1A can be found as it is close to that of 1C. However,
+    the midpoint is now $(\frac{3}{4}, \frac{3}{4})$. We can safely conclude
+    that the midpoints maintain the same form:
+    \begin{align*}
+      p_0 &= (0, 1) \\
+      p_1 &= (c, 1) \\
+      p_2 &= (1, c) \\
+      p_3 &= (1, 0)
+    \end{align*}
+    To find $c$:
+    \begin{align*}
+      \frac{3}{4} &= p_x (0.5) = (1 - 0.5)^3 p_{0,x} + 3(0.5)(1 - 0.5)^2 p_{1,x} + 3(0.5)^2(1 - 0.5)*p_{2, x} + (0.5)^3 p_{3,x}\\
+      \frac{3}{4} &= \frac{1}{8}(0) + \frac{3}{8}c + \frac{3}{8}(1) + \frac{1}{8}(1)\\
+      \frac{3}{4} &= \frac{4}{8} + \frac{3}{8}c \\
+      6 &= \frac{4}{8} + \frac{3}{8}c \\
+      c = \frac{2}{3}
+    \end{align*}
+    So therefore, our points are:
+    \begin{itemize}
+      \item $\textbf{p}_0 = (0, 1)$
+      \item $\textbf{p}_1 = (\frac{2}{3}, 1)$
+      \item $\textbf{p}_2 = (1, \frac{2}{3})$
+      \item $\textbf{p}_3 = (1, 0)$
+    \end{itemize}
+\end{enumerate}
+
+\section{Rendering Fonts}
+\begin{enumerate}[label=\Alph*)]
+  \item All the knots are $C^0$ continuous since the shape as a whole is
+  continuous. In other words, there are no gaps between adjacent knots.
+  \item 4, 11, 2, 3, 5, 6, 9, 10, 12, 13 are $G_1$ continuous because the
+  tangents are collinear. (The corner knots 1, 7, 8, and 14 are not $G_1$
+  continuous since the tangents are not collinear).
+  \item 5, 10 are $C_1$ continuous since they have collinear tangents, as needed
+  to be $G_1$ continuous, and the adjacent off-curve control points are of
+  equivalent magnitude.
+\end{enumerate}
+
+\section{Scrolling Fonts}
+\begin{enumerate}[label=\Alph*)]
+  \item If a 1000 px wide window can fit 10 letters, then a letter is 100 px
+  wide. So to move 3 pixels every frame, we would need to 300 px every frame. So
+  we need 300 px/s at 60 fps. $\frac{300 px}{60 \text{ frame}} = 5
+  px/\text{frame}$. Therefore we would have to move 5 pixels per frame.
+  \item $\frac{300 px}{24\text{frame}} = 12.5 px/\text{frame}$. We would have to
+  move 12.5 pixels per second. Since we can only move whole integer values of
+  pixels, one possible solution to this problem would be to alternate between
+  moving 12 and 13 pixels per frame to keep the average of 12.5 pixels per
+  second.
+\end{enumerate}
+
+% 1c
+% d = 4/3(sqrt(2) - 1)
+%
+\end{document}
