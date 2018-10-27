@@ -59,7 +59,8 @@ void Program::setupWindow() {
 
 	//Set the custom function that tracks key presses
 	glfwSetKeyCallback(window, KeyCallback);
-
+	//Set the custom function that tracks cursor position 
+	glfwSetCursorPosCallback(window, cursor_position_callback);
 	//Bring the new window to the foreground (not strictly necessary but convenient)
 	glfwMakeContextCurrent(window);
 
@@ -89,50 +90,84 @@ void ErrorCallback(int error, const char* description) {
 }
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	//Key codes are often prefixed with GLFW_KEY_ and can be found on the GLFW website
+	Program* program = (Program*)glfwGetWindowUserPointer(window);
 	if (action == GLFW_PRESS) {
-		//Program *program = (Program*)glfwGetWindowUserPointer(window);
 		switch (key) {
 		case GLFW_KEY_ESCAPE:
 			glfwSetWindowShouldClose(window, GL_TRUE);
 			std::cout << "Exiting program." << std::endl;
 			break;
-		case GLFW_KEY_1: // Quadratic
-			std::cout << "Part I: Bezier Curves - Scene I" << std::endl;
-			//renderer->degree = 2;
+		case GLFW_KEY_1: 
+			//Part I: Bezier Curves - Scene I"
 			currentScene->setScene(Scene::QUADRATIC);
 			break;
-		case GLFW_KEY_2: // Cubic
-			std::cout << "Part I: Bezier Curves - Scene II" << std::endl;
-			//renderer->degree = 3;
+		case GLFW_KEY_2: 
+			//Part I: Bezier Curves - Scene II
 			currentScene->setScene(Scene::CUBIC);
 			break;
 		case GLFW_KEY_3:
-			std::cout << "Part II: Rendering Fonts - Lora" << std::endl;
+			//Part II: Rendering Fonts - Lora
 			currentScene->setScene(Scene::LORA);
 			break;
 		case GLFW_KEY_4:
-			std::cout << "Part II: Rendering Fonts - Source Sans Pro" << std::endl;
+			//Part II: Rendering Fonts - Source Sans Pro
 			currentScene->setScene(Scene::SOURCE_SANS_PRO);
 			break;
 		case GLFW_KEY_5:
-			std::cout << "Part II: Rendering Fonts - Comic Sans" << std::endl;
+			//Part II: Rendering Fonts - Comic Sans
 			currentScene->setScene(Scene::COMIC_SANS);
 			break;
 		case GLFW_KEY_6:
-			std::cout << "Part III: Scrolling Text - Alex Brush" << std::endl;
+			//Part III: Scrolling Text - Alex Brush
 			currentScene->setScene(Scene::SCROLLING_ALEX_BRUSH);
 			break;
 		case GLFW_KEY_7:
-			std::cout << "Part III: Scrolling Text - Inconsolata" << std::endl;
+			//Part III: Scrolling Text - Inconsolata
 			currentScene->setScene(Scene::SCROLLING_INCONSOLATA);
 			break;
-		case GLFW_KEY_UP:
+		case GLFW_KEY_8:
+			//Part III: Scrolling Text - Zapfino
+			currentScene->setScene(Scene::SCROLLING_ZAPFINO);
+			break;
+		case GLFW_KEY_9:
+			//BONUS
+			//currentScene->setScene(Scene::BONUS);
+			break;
+		case GLFW_KEY_RIGHT:
+			//increases scroll speed
 			currentScene->speedUp();
 			break;
-		case GLFW_KEY_DOWN:
+		case GLFW_KEY_LEFT:
+			//decreases scroll speed
 			currentScene->speedDown();
 			break;
 		}
 	}
+}
+
+void cursor_position_callback(GLFWwindow * window, double xpos, double ypos)
+{
+	Program* program = (Program*)glfwGetWindowUserPointer(window);
+	GLboolean leftDown;
+	//conditional to track left mouse button
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+		leftDown = true;
+	}
+	else {
+		leftDown = false;
+	}
+	//when left botton is held down, do this
+	if (leftDown) {
+		std::cout << "left clicked" << std::endl;
+		
+	}
+		
+
+
+	//debugging print statements
+	// std::cout << "x: ";
+	// std::cout << xpos;
+	// std::cout << " y: ";
+	// std::cout << ypos << std::endl;
+
 }

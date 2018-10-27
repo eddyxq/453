@@ -3,20 +3,59 @@
 #include "ShaderTools.h"
 
 RenderingEngine::RenderingEngine() {
-	shaderProgram = ShaderTools::InitializeShaders();
-	shaderProgram2 = ShaderTools::InitializeShaders2();
-	d = glGetUniformLocation(shaderProgram, "degree");
+	shaderProgramCurves = ShaderTools::InitializeShaders();
+	shaderProgramNoTesselation = ShaderTools::InitializeShaders2();
+	dx = 0.0f;
+	degreeLocation = glGetUniformLocation(shaderProgramCurves, "degree");
+	dxCurvesLocation = glGetUniformLocation(shaderProgramCurves, "dx");
+	dxNoTesselationLocation = glGetUniformLocation(shaderProgramNoTesselation, "dx");
 }
 
 RenderingEngine::~RenderingEngine() {
 
 }
 
-void RenderingEngine::RenderDegreeOneCurves(const std::vector<Geometry>& objects)
+void RenderingEngine::RenderControlLines(const std::vector<Geometry>& objects)
 {
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glUseProgram(shaderProgram2);
+	glUseProgram(shaderProgramNoTesselation);
+	glUniform1f(dxNoTesselationLocation, dx);
+	for (const Geometry& g : objects) {
+		if (g.controlPointsPerCurve > 0) {
+			for (unsigned int min = 0; min <= g.verts.size() - g.controlPointsPerCurve; min += g.controlPointsPerCurve) {
+				glBindVertexArray(g.vao);
+				glDrawArrays(g.drawMode, min, g.controlPointsPerCurve);
+				glBindVertexArray(0);
+			}
+		}
+	}
+	glUseProgram(0);
+	CheckGLErrors();
+}
+
+void RenderingEngine::RenderControlPoints(const std::vector<Geometry>& objects)
+{
+	glUseProgram(shaderProgramNoTesselation);
+	glUniform1f(dxNoTesselationLocation, dx);
+	glPointSize(6.0f);
+	for (const Geometry& g : objects) {
+		glBindVertexArray(g.vao);
+		glDrawArrays(g.drawMode, 0, g.verts.size());
+		glBindVertexArray(0);
+	}
+	glUseProgram(0);
+	CheckGLErrors();
+}
+
+void RenderingEngine::RenderDegreeOneCurves(const std::vector<Geometry>& objects)
+{
+	if (!fontScene) {
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	glUseProgram(shaderProgramNoTesselation);
+	glUniform1f(dxNoTesselationLocation, dx);
 	for (const Geometry& g : objects) {
 		glBindVertexArray(g.vao);
 		glDrawArrays(g.drawMode, 0, g.verts.size());
@@ -34,8 +73,9 @@ void RenderingEngine::RenderDegreeTwoCurves(const std::vector<Geometry>& objects
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
-	glUseProgram(shaderProgram);
-	glUniform1i(d, degree);
+	glUseProgram(shaderProgramCurves);
+	glUniform1i(degreeLocation, degree);
+	glUniform1f(dxCurvesLocation, dx);
 	glPatchParameteri(GL_PATCH_VERTICES, 3);
 	for (const Geometry& g : objects) {
 		glBindVertexArray(g.vao);
@@ -54,8 +94,9 @@ void RenderingEngine::RenderDegreeThreeCurves(const std::vector<Geometry>& objec
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
-	glUseProgram(shaderProgram);
-	glUniform1i(d, degree);
+	glUseProgram(shaderProgramCurves);
+	glUniform1i(degreeLocation, degree);
+	glUniform1f(dxCurvesLocation, dx);
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	for (const Geometry& g : objects) {
 		glBindVertexArray(g.vao);

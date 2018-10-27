@@ -29,5 +29,6 @@ private:
 //Note, GLFW requires them to not be member functions of a class
 void ErrorCallback(int error, const char* description);
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 
 #endif /* PROGRAM_H_ */

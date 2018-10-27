@@ -17,6 +17,14 @@ public:
 	// Part I
 	static const int CUBIC = 0;
 	static const int QUADRATIC = 1;
+
+	const int QUADRATIC_BEZIER_CURVE_COUNT = 4;
+	const int QUADRATIC_CONTROL_POINT_COUNT = 3;
+	const float QUADRATIC_NORMALIZATION_FACTOR = 4.0f;
+
+	const int CUBIC_BEZIER_CURVE_COUNT = 5;
+	const int CUBIC_CONTROL_POINT_COUNT = 4;
+	const float CUBIC_NORMALIZATION_FACTOR = 6.0f;
 	// Part II
 	static const int LORA = 2;
 	static const int SOURCE_SANS_PRO = 3;
@@ -24,6 +32,19 @@ public:
 	// Part III
 	static const int SCROLLING_ALEX_BRUSH = 5;
 	static const int SCROLLING_INCONSOLATA = 6;
+	static const int SCROLLING_ZAPFINO = 7;
+	const float SCROLL_AMOUNT = 0.001f;
+	const float SCROLL_MAX = 0.025f;
+	const float SCROLL_START = -3*SCROLL_AMOUNT;
+
+	const float LORA_NORMALIZATION_FACTOR = 2.6f;
+	const float SOURCE_SANS_PRO_NORMALIZATION_FACTOR = 2.5f;
+	const float COMIC_SANS_NORMALIZATION_FACTOR = 3.5f;
+	const float ALEX_BRUSH_NORMALIZATION_FACTOR = 2.0f;
+	const float INCONSOLATA_NORMALIZATION_FACTOR = 3.0f;
+	const float ZAPFINO_NORMALIZATION_FACTOR = 3.0f;
+	//BONUS
+	static const int BONUS = 8;
 
 	//Send geometry to the renderer
 	void displayScene();
@@ -31,11 +52,9 @@ public:
 	void speedUp();
 	void speedDown();
 
-	float xOffset;
-	float yOffset;
-
-	float xOffsetScrolling;
-	float yOffsetScrolling;
+	float xOffsetStart;
+	float yOffsetStart;
+	float xOffsetStartScrolling;
 
 private:
 	RenderingEngine* renderer;
@@ -46,22 +65,21 @@ private:
 	Geometry degreeOne;
 	Geometry degreeTwo;
 	Geometry degreeThree;
+	Geometry controlPolygon;
+	Geometry controlPoints;
 
 	std::vector<Geometry> degreeOneObjects;
 	std::vector<Geometry> degreeTwoObjects;
 	std::vector<Geometry> degreeThreeObjects;
-
-	// Resizes the font size and advance
-	const float FONT_NORMALIZATION_FACTOR = 7.0f;
+	std::vector<Geometry> polygonObjects;
+	std::vector<Geometry> pointObjects;
 
 	float scrollSpeed;
-	
+
 	void clearWindow();
 	void pushObjects();
-
-	void drawGlyph(MyGlyph glyph, float xOffset, float yOffset);
-	void drawString(std::string str, std::string font, std::string fontPath, float xStart, float yStart);
-
+	void drawGlyph(MyGlyph glyph, float xOffset, float yOffset, float normalizationFactor);
+	void drawString(std::string str, std::string fontPath, float xStart, float yStart, float normalizationFactor);
 	void drawQuadratic();
 	void drawCubic();
 	void drawLora();
@@ -69,6 +87,8 @@ private:
 	void drawComicSans();
 	void drawScrollingAlexBrush();
 	void drawScrollingInconsolata();
+	void drawScrollingZapfino();
+	void drawBonus();
 };
 
 #endif /* SCENE_H_ */

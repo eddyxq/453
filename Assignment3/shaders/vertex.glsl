@@ -11,6 +11,8 @@
 layout(location = 0) in vec3 VertexPosition;
 layout(location = 1) in vec3 VertexColor;
 
+uniform float dx;
+
 // output to be interpolated between vertices and passed to the fragment stage
 out vec3 color;
 
@@ -18,7 +20,10 @@ void main()
 {
 
     // assign vertex position without modification
-    gl_Position = vec4(VertexPosition.xy, 0.0, 1.0);
+	vec3 transformedPosition = VertexPosition;
+	transformedPosition.x += dx;
+	
+    gl_Position = vec4(transformedPosition.xy, 0.0, 1.0);
 
     // assign output colour to be interpolated
     color = VertexColor;

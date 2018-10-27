@@ -10,12 +10,11 @@
 #include "GlyphExtractor.h"
 
 Scene::Scene(RenderingEngine* renderer) : renderer(renderer) {
-	scrollSpeed = 0.01f;
-	xOffset = -0.5f;
-	yOffset = 0.0f;
-	xOffsetScrolling = xOffset;
-	yOffsetScrolling = yOffset;
-	//setScene(QUADRATIC);
+	scrollSpeed = SCROLL_START;
+	xOffsetStart = -0.5f;
+	xOffsetStartScrolling = 0.0f;
+	yOffsetStart = 0.0f;
+	setScene(QUADRATIC);
 }
 
 Scene::~Scene() {
@@ -25,15 +24,41 @@ Scene::~Scene() {
 void Scene::displayScene() {
 	switch (currentScene) {
 	case SCROLLING_ALEX_BRUSH:
-		setScene(SCROLLING_ALEX_BRUSH);
+		renderer->dx += scrollSpeed;
+		if (renderer->dx > 2.0f) {
+			renderer->dx = -7.125f + xOffsetStart;
+		}
+		else if (renderer->dx < -7.125f + xOffsetStart) {
+			renderer->dx = 2.0f;
+		}
 		break;
 	case SCROLLING_INCONSOLATA:
-		setScene(SCROLLING_INCONSOLATA);
+		renderer->dx += scrollSpeed;
+		if (renderer->dx > 2.0f) {
+			renderer->dx = -7.287f + xOffsetStart;
+		}
+		else if (renderer->dx < -7.287f + xOffsetStart) {
+			renderer->dx = 2.0f;
+		}
 		break;
+	case SCROLLING_ZAPFINO:
+		renderer->dx += scrollSpeed;
+		if (renderer->dx > 2.0f) {
+			renderer->dx = -8.641f + xOffsetStart;
+		}
+		else if (renderer->dx < -8.641f + xOffsetStart) {
+			renderer->dx = 2.0f;
+		}
+		break;
+	default:
+		renderer->dx = 0;
+		xOffsetStart = -1.0f;
 	}
+	renderer->RenderControlLines(polygonObjects);
 	renderer->RenderDegreeOneCurves(degreeOneObjects);
 	renderer->RenderDegreeTwoCurves(degreeTwoObjects);
 	renderer->RenderDegreeThreeCurves(degreeThreeObjects);
+	renderer->RenderControlPoints(pointObjects);
 }
 
 void Scene::setScene(int sceneType) {
@@ -60,19 +85,29 @@ void Scene::setScene(int sceneType) {
 	case SCROLLING_INCONSOLATA:
 		drawScrollingInconsolata();
 		break;
+	case SCROLLING_ZAPFINO:
+		drawScrollingZapfino();
+		break;
+	case BONUS:
+		drawBonus();
+		break;
+
 	default:
 		std::cerr << "Scene.setScene(): Invalid sceneType." << std::endl;
 	}
 	currentScene = sceneType;
 	pushObjects();
 }
-
 void Scene::speedUp() {
-	scrollSpeed += 0.1f;
+	if (scrollSpeed < SCROLL_MAX) {
+		scrollSpeed += SCROLL_AMOUNT;
+	}
 }
 
 void Scene::speedDown() {
-	scrollSpeed -= 0.1f;
+	if (scrollSpeed > -SCROLL_MAX) {
+		scrollSpeed -= SCROLL_AMOUNT;
+	}
 }
 
 void Scene::clearWindow() {
@@ -87,6 +122,16 @@ void Scene::clearWindow() {
 	degreeThreeObjects.clear();
 	degreeThree.verts.clear();
 	degreeThree.colors.clear();
+
+	polygonObjects.clear();
+	controlPolygon.verts.clear();
+	controlPolygon.colors.clear();
+	controlPolygon.controlPointsPerCurve = 0;
+
+	pointObjects.clear();
+	controlPoints.verts.clear();
+	controlPoints.colors.clear();
+	controlPoints.controlPointsPerCurve = 0;
 }
 
 void Scene::pushObjects() {
@@ -104,46 +149,56 @@ void Scene::pushObjects() {
 	RenderingEngine::assignBuffers(degreeThree);
 	RenderingEngine::setBufferData(degreeThree);
 	degreeThreeObjects.push_back(degreeThree);
+
+	controlPolygon.drawMode = GL_LINE_STRIP;
+	RenderingEngine::assignBuffers(controlPolygon);
+	RenderingEngine::setBufferData(controlPolygon);
+	polygonObjects.push_back(controlPolygon);
+
+	controlPoints.drawMode = GL_POINTS;
+	RenderingEngine::assignBuffers(controlPoints);
+	RenderingEngine::setBufferData(controlPoints);
+	pointObjects.push_back(controlPoints);
 }
 
-void Scene::drawGlyph(MyGlyph glyph, float xOffset, float yOffset) {
+void Scene::drawGlyph(MyGlyph glyph, float xOffset, float yOffset, float normalizationFactor) {
 	for (unsigned int i = 0; i < glyph.contours.size(); i++) {
 		for (unsigned int j = 0; j < glyph.contours[i].size(); j++) {
 			for (unsigned int k = 0; k <= glyph.contours[i][j].degree; k++) {
-				float x = glyph.contours[i][j].x[k] * (1.0f / FONT_NORMALIZATION_FACTOR);
-				float y = glyph.contours[i][j].y[k] * (1.0f / FONT_NORMALIZATION_FACTOR);
-				float z = 1.0f * (1.0f / FONT_NORMALIZATION_FACTOR);
+				float x = glyph.contours[i][j].x[k] * (1.0f / normalizationFactor);
+				float y = glyph.contours[i][j].y[k] * (1.0f / normalizationFactor);
+				float z = 1.0f * (1.0f / normalizationFactor);
 
-				if (glyph.contours[i][j].degree == 1) {
+				switch (glyph.contours[i][j].degree) {
+				case 1:
 					degreeOne.verts.push_back(glm::vec3(x + xOffset, y + yOffset, z));
 					degreeOne.colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
-				}
-				else if (glyph.contours[i][j].degree == 2) {
+					break;
+				case 2:
 					degreeTwo.verts.push_back(glm::vec3(x + xOffset, y + yOffset, z));
 					degreeTwo.colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
-				}
-				else if (glyph.contours[i][j].degree == 3) {
+					break;
+				case 3:
 					degreeThree.verts.push_back(glm::vec3(x + xOffset, y + yOffset, z));
 					degreeThree.colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+					break;
 				}
 			}
 		}
 	}
 }
 
-void Scene::drawString(std::string str, std::string font, std::string fontPath, float xStart, float yStart) {
+void Scene::drawString(std::string str, std::string fontPath, float xStart, float yStart, float normalizationFactor) {
 	glyphExtractor.LoadFontFile(fontPath);
 	for (char& c : str) {
 		glyph = glyphExtractor.ExtractGlyph(c);
-		drawGlyph(glyph, xStart, yStart);
-		xStart += glyph.advance / FONT_NORMALIZATION_FACTOR;
+		drawGlyph(glyph, xStart, yStart, normalizationFactor);
+		xStart += glyph.advance / normalizationFactor;
 	}
 }
 
 void Scene::drawQuadratic() {
-	const int BEZIER_CURVE_COUNT = 4;
-	const int CONTROL_POINT_COUNT = 3;
-	const float NORMALIZATION_FACTOR = 4.0f;
+	controlPolygon.controlPointsPerCurve = QUADRATIC_CONTROL_POINT_COUNT;
 
 	std::vector<glm::vec3> curve1 = {
 		glm::vec3(1.0f, 1.0f, 1.0f),
@@ -168,22 +223,31 @@ void Scene::drawQuadratic() {
 	};
 
 	std::vector<std::vector<glm::vec3>> scene1 = { curve1, curve2, curve3, curve4 };
-	for (int curve = 0; curve < BEZIER_CURVE_COUNT; curve++) {
-		for (int point = 0; point < CONTROL_POINT_COUNT; point++) {
+	for (int curve = 0; curve < QUADRATIC_BEZIER_CURVE_COUNT; curve++) {
+		for (int point = 0; point < QUADRATIC_CONTROL_POINT_COUNT; point++) {
 			// Control points
-			degreeTwo.verts.push_back(scene1[curve][point] * (1.0f/NORMALIZATION_FACTOR));
+			degreeTwo.verts.push_back(scene1[curve][point] * (1.0f/QUADRATIC_NORMALIZATION_FACTOR));
+			controlPolygon.verts.push_back(scene1[curve][point] * (1.0f/QUADRATIC_NORMALIZATION_FACTOR));
+			controlPoints.verts.push_back(scene1[curve][point] * (1.0f/QUADRATIC_NORMALIZATION_FACTOR));
 			// Color
-			degreeTwo.colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+			// Green curves
 			degreeTwo.colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-			degreeTwo.colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+			// Blue polygon curves
+			controlPolygon.colors.push_back(glm::vec3(0.0f, 0.0f, 0.5f));
+			if (point == 0 || point == 2) {
+				// Cyan on curve control points
+				controlPoints.colors.push_back(glm::vec3(0.0f, 1.0f, 1.0f));
+			}
+			else {
+				// Magenta off curve control points
+				controlPoints.colors.push_back(glm::vec3(1.0f, 0.0f, 1.0f));
+			}
 		}
 	}
 }
 
 void Scene::drawCubic() {
-	const int BEZIER_CURVE_COUNT = 5;
-	const int CONTROL_POINT_COUNT = 4;
-	const float NORMALIZATION_FACTOR = 5.0f;
+	controlPolygon.controlPointsPerCurve = CUBIC_CONTROL_POINT_COUNT;
 
 	std::vector<glm::vec3> curve1 = {
 		glm::vec3(1.0f, 1.0f, 1.0f),
@@ -219,45 +283,63 @@ void Scene::drawCubic() {
 	};
 
 	std::vector<std::vector<glm::vec3>> scene2 = { curve1, curve2, curve3, curve4, curve5 };
-	for (int curve = 0; curve < BEZIER_CURVE_COUNT; curve++) {
-		for (int point = 0; point < CONTROL_POINT_COUNT; point++) {
+	for (int curve = 0; curve < CUBIC_BEZIER_CURVE_COUNT; curve++) {
+		for (int point = 0; point < CUBIC_CONTROL_POINT_COUNT; point++) {
 			// Control points
-			glm::vec3 p = scene2[curve][point] * (1.0f / NORMALIZATION_FACTOR);
+			glm::vec3 p = scene2[curve][point] * (1.0f / CUBIC_NORMALIZATION_FACTOR);
 			p.x -= 1.0f;
 			p.y -= 0.5f;
 			degreeThree.verts.push_back(p);
+			controlPolygon.verts.push_back(p);
+			controlPoints.verts.push_back(p);
 			// Color
-			degreeThree.colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+			// Green curves
 			degreeThree.colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-			degreeThree.colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
-			degreeThree.colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+			// Blue polygon curves
+			controlPolygon.colors.push_back(glm::vec3(0.0f, 0.0f, 0.5f));
+			if (point == 0 || point == 3) {
+				// Cyan on curve control points
+				controlPoints.colors.push_back(glm::vec3(0.0f, 1.0f, 1.0f));
+			}
+			else {
+				// Magenta off curve control points
+				controlPoints.colors.push_back(glm::vec3(1.0f, 0.0f, 1.0f));
+			}
 		}
 	}
 }
 
 void Scene::drawLora()
 {
-	drawString("Evan Quan", "lora", "fonts/lora/Lora-Regular.ttf", xOffset, yOffset);
+	drawString("Evan Quan", "fonts/lora/Lora-Regular.ttf", xOffsetStart, yOffsetStart, LORA_NORMALIZATION_FACTOR);
 }
 
 void Scene::drawSourceSansPro()
 {
-	drawString("Eddy Qiang", "sourcesanspro", "fonts/source-sans-pro/SourceSansPro-Regular.otf", xOffset, yOffset);
+	drawString("Eddy Qiang", "fonts/source-sans-pro/SourceSansPro-Regular.otf", xOffsetStart, yOffsetStart, SOURCE_SANS_PRO_NORMALIZATION_FACTOR);
 }
 
 void Scene::drawComicSans()
 {
-	drawString("Evan and Eddy", "comicsans", "fonts/comic-sans/ComicSans.ttf", xOffset, yOffset);
+	drawString("Evan and Eddy", "fonts/comic-sans/ComicSans.ttf", xOffsetStart, yOffsetStart, COMIC_SANS_NORMALIZATION_FACTOR);
 }
 
 void Scene::drawScrollingAlexBrush()
 {
-	xOffsetScrolling = (float) fmod(xOffsetScrolling + scrollSpeed, 1);
-	drawString("The quick brown fox jumps over the lazy dog.", "alex", "fonts/alex-brush/AlexBrush-Regular.ttf", xOffsetScrolling, yOffsetScrolling);
+	drawString("The quick brown fox jumps over the lazy dog.", "fonts/alex-brush/AlexBrush-Regular.ttf", xOffsetStartScrolling, yOffsetStart, ALEX_BRUSH_NORMALIZATION_FACTOR);
 }
 
 void Scene::drawScrollingInconsolata()
 {
-	xOffsetScrolling = (float) fmod(xOffsetScrolling + scrollSpeed, 1);
-	drawString("abcdefghijklmnopqrstuvwxyz", "inconsolata", "fonts/zapfino/Zapfino.ttf", xOffsetScrolling, yOffsetScrolling);
+
+	drawString("The quick brown fox jumps over the lazy dog.", "fonts/inconsolata/Inconsolata.otf", xOffsetStartScrolling, yOffsetStart, INCONSOLATA_NORMALIZATION_FACTOR);
+}
+void Scene::drawScrollingZapfino()
+{
+	drawString("The quick brown fox jumps over the lazy dog.", "fonts/zapfino/Zapfino.ttf", xOffsetStartScrolling, yOffsetStart, ZAPFINO_NORMALIZATION_FACTOR);
+}
+
+void Scene::drawBonus()
+{
+	drawString("A", "fonts/zapfino/Zapfino.ttf", -0.1f, yOffsetStart, ZAPFINO_NORMALIZATION_FACTOR);
 }

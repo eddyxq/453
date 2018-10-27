@@ -37,6 +37,9 @@ public:
 
 	//Draw mode for how OpenGL interprets primitives
 	GLuint drawMode;
+
+	// For connecting the right about of control polygons
+	int controlPointsPerCurve;
 };
 
 #endif /* GEOMETRY_H_ */

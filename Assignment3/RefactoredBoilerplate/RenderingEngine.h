@@ -12,6 +12,8 @@ public:
 	virtual ~RenderingEngine();
 
 	//Renders each object
+	void RenderControlLines(const std::vector<Geometry>& objects);
+	void RenderControlPoints(const std::vector<Geometry>& objects);
 	void RenderDegreeOneCurves(const std::vector<Geometry>& objects);
 	void RenderDegreeTwoCurves(const std::vector<Geometry>& objects);
 	void RenderDegreeThreeCurves(const std::vector<Geometry>& objects);
@@ -25,9 +27,12 @@ public:
 	bool CheckGLErrors();
 
 	//Pointer to the current shader program being used to render
-	GLuint shaderProgram;
-	GLuint shaderProgram2;
-	GLuint d;
+	GLuint shaderProgramCurves;
+	GLuint shaderProgramNoTesselation;
+	GLuint degreeLocation;
+	GLuint dxCurvesLocation;
+	GLuint dxNoTesselationLocation;
+	float dx;
 	int degree;
 	bool fontScene;
 };
