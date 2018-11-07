@@ -127,10 +127,12 @@
     <ClCompile Include="imagebuffer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Program.cpp" />
+    <ClCompile Include="Ray.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imagebuffer.h" />
     <ClInclude Include="Program.h" />
+    <ClInclude Include="Ray.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

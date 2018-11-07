@@ -1,4 +1,6 @@
 ﻿  Program.cpp
-c:\users\eddy\source\repos\a4\a4\program.cpp(28): warning C4018: '<': signed/unsigned mismatch
-c:\users\eddy\source\repos\a4\a4\program.cpp(29): warning C4018: '<': signed/unsigned mismatch
-  a4.vcxproj -> C:\Users\eddy\source\repos\a4\Debug\a4.exe
+c:\users\eddy\desktop\github\453\assignment4\a4\program.cpp(27): warning C4018: '<': signed/unsigned mismatch
+c:\users\eddy\desktop\github\453\assignment4\a4\program.cpp(29): warning C4018: '<': signed/unsigned mismatch
+  Ray.cpp
+  Generating Code...
+  a4.vcxproj -> C:\Users\eddy\Desktop\GitHub\453\Assignment4\Debug\a4.exe

@@ -1,56 +1,57 @@
-/*
- * Program.cpp
- *
- *  Created on: Sep 10, 2018
- *      Author: John Hall
- */
-
 #include "Program.h"
-
+#include "Ray.h"
 #include <iostream>
 #include <string>
-
-//**Must include glad and GLFW in this order or it breaks**
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-Program::Program() {
+Program::Program() 
+{
         setupWindow();
 }
 
-Program::~Program() {
-  
-}
+Program::~Program() {}
 
-void Program::start() {
+void Program::start() 
+{
+	//code example of ray from tutorial
+	Ray myRay = Ray(glm::vec3(0.0,0.0,0.0), glm::vec3(0.0,-1.0,-4.0));
+	glm::vec3 result = myRay.evaluate(2.0);
+
+	std::cout << result.x << std::endl;
+	std::cout << result.y << std::endl;
+	std::cout << result.z << std::endl;
+	//--------
 
     image.Initialize();
-	for (unsigned int i = 0; i < image.Width(); i++) {
-	  for (unsigned int j = 0; j < image.Height(); j++) {
+	for (unsigned int i = 0; i < image.Width(); i++) 
+	{
+	  for (unsigned int j = 0; j < image.Height(); j++) 
+	  {
 	    //set pixel colors here
 
-		//trace my rays
-
+		//trace my rays here
 
 		  // create ray
 		  // get intersection
-		  // pixel color
 
+		// pixel color
 	    image.SetPixel(i, j, glm::vec3(1.0, 1.0, 0.0));
 	  }
 	}
 	//Main render loop
-	while(!glfwWindowShouldClose(window)) {
+	while(!glfwWindowShouldClose(window))
+	{
 	        image.Render();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
 }
 
 void Program::setupWindow() {
 	//Initialize the GLFW windowing system
-	if (!glfwInit()) {
+	if (!glfwInit()) 
+	{
 		std::cout << "ERROR: GLFW failed to initialize, TERMINATING" << std::endl;
 		return;
 	}
@@ -67,7 +68,8 @@ void Program::setupWindow() {
 	int width = 1024;
 	int height = 1024;
 	window = glfwCreateWindow(width, height, "CPSC 453 OpenGL Boilerplate", 0, 0);
-	if (!window) {
+	if (!window) 
+	{
 		std::cout << "Program failed to create GLFW window, TERMINATING" << std::endl;
 		glfwTerminate();
 		return;
@@ -80,7 +82,8 @@ void Program::setupWindow() {
 	glfwMakeContextCurrent(window);
 
 	//Intialize GLAD (finds appropriate OpenGL configuration for your system)
-	if (!gladLoadGL()) {
+	if (!gladLoadGL()) 
+	{
 		std::cout << "GLAD init failed" << std::endl;
 		return;
 	}
@@ -91,7 +94,8 @@ void Program::setupWindow() {
 
 
 
-void Program::QueryGLVersion() {
+void Program::QueryGLVersion() 
+{
 	// query opengl version and renderer information
 	std::string version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
 	std::string glslver = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
@@ -102,14 +106,17 @@ void Program::QueryGLVersion() {
 		<< "on renderer [ " << renderer << " ]" << std::endl;
 }
 
-void ErrorCallback(int error, const char* description) {
+void ErrorCallback(int error, const char* description) 
+{
 	std::cout << "GLFW ERROR " << error << ":" << std::endl;
 	std::cout << description << std::endl;
 }
 
-void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
+{
 	//Key codes are often prefixed with GLFW_KEY_ and can be found on the GLFW website
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) 
+	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 }
