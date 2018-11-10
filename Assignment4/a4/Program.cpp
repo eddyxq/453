@@ -12,6 +12,29 @@ Program::Program()
 
 Program::~Program() {}
 
+struct Light
+{
+	glm::vec3 vec;
+};
+
+struct Sphere
+{
+	glm::vec3 center;
+	double radius;
+};
+
+struct Plane
+{
+	glm::vec3 vec1, vec2;
+};
+
+struct Triangle
+{
+	glm::vec3 vertex1;
+	glm::vec3 vertex2;
+	glm::vec3 vertex3;
+};
+
 void Program::start() 
 {
 	//code example of ray from tutorial
@@ -24,9 +47,9 @@ void Program::start()
 	//--------
 
     image.Initialize();
-	for (unsigned int i = 0; i < image.Width(); i++) 
+	for (int i = 0; i < image.Width(); i++) 
 	{
-	  for (unsigned int j = 0; j < image.Height(); j++) 
+	  for (int j = 0; j < image.Height(); j++) 
 	  {
 	    //set pixel colors here
 
@@ -74,20 +97,16 @@ void Program::setupWindow() {
 		glfwTerminate();
 		return;
 	}
-
 	//Set the custom function that tracks key presses
 	glfwSetKeyCallback(window, KeyCallback);
-
 	//Bring the new window to the foreground (not strictly necessary but convenient)
 	glfwMakeContextCurrent(window);
-
 	//Intialize GLAD (finds appropriate OpenGL configuration for your system)
 	if (!gladLoadGL()) 
 	{
 		std::cout << "GLAD init failed" << std::endl;
 		return;
 	}
-
 	//Query and print out information about our OpenGL environment
 	QueryGLVersion();
 }
@@ -106,6 +125,83 @@ void Program::QueryGLVersion()
 		<< "on renderer [ " << renderer << " ]" << std::endl;
 }
 
+void Program::scene1()
+{
+	
+	//light
+	Light light;
+	light.vec = {0, 2.5, -7.75};
+
+	
+	//reflective grey sphere
+	Sphere sphere;
+	sphere.center = {0.9, -1.925, -6.69};
+	sphere.radius = 0.825;
+	//blue pyramid
+	Triangle pyramid_triangle1, pyramid_triangle2, pyramid_triangle3, pyramid_triangle4;
+	pyramid_triangle1.vertex1 = {-0.4, -2.75, -9.55};
+	pyramid_triangle1.vertex2 = {-0.93, 0.55, -8.51};
+	pyramid_triangle1.vertex3 = {0.11, -2.75, -7.98};
+
+	pyramid_triangle2.vertex1 = {0.11, -2.75, -7.98};
+	pyramid_triangle2.vertex2 = {-0.93, 0.55, -8.51};
+	pyramid_triangle2.vertex3 = {-1.46, -2.75, -7.47};
+
+	pyramid_triangle3.vertex1 = {-1.46, -2.75, -7.47};
+	pyramid_triangle3.vertex2 = {-0.93, 0.55, -8.51};
+	pyramid_triangle3.vertex3 = {-1.97, -2.75, -9.04};
+
+	pyramid_triangle4.vertex1 = {-1.97, -2.75, -9.04};
+	pyramid_triangle4.vertex2 = {-0.93, 0.55, -8.51};
+	pyramid_triangle4.vertex3 = {-0.4, -2.75, -9.55};
+	//ceiling
+	Triangle ceiling_triangle1, ceiling_triangle2;
+	ceiling_triangle1.vertex1 = {2.75, 2.75, -10.5};
+	ceiling_triangle1.vertex2 = {2.75, 2.75, -5};
+	ceiling_triangle1.vertex3 = {-2.75, 2.75, -5};
+
+	ceiling_triangle2.vertex1 = {-2.75, 2.75, -10.5};
+	ceiling_triangle2.vertex2 = {2.75, 2.75, -10.5};
+	ceiling_triangle2.vertex3 = {-2.75, 2.75, -5};
+	//green wall
+	Triangle green_wall_triangle1, green_wall_triangle2;
+	green_wall_triangle1.vertex1 = {2.75, 2.75, -5};
+	green_wall_triangle1.vertex2 = {2.75, 2.75, -10.5};
+	green_wall_triangle1.vertex3 = {2.75, -2.75, -10.5};
+
+	green_wall_triangle2.vertex1 = {2.75, -2.75, -5};
+	green_wall_triangle2.vertex2 = {2.75, 2.75, -5};
+	green_wall_triangle2.vertex3 = {2.75, -2.75, -10.5};
+	//red wall
+	Triangle red_wall_triangle1, red_wall_triangle2;
+	red_wall_triangle1.vertex1 = {-2.75, -2.75, -5};
+	red_wall_triangle1.vertex2 = {-2.75, -2.75, -10.5};
+	red_wall_triangle1.vertex3 = {-2.75, 2.75, -10.5};
+
+	red_wall_triangle2.vertex1 = {-2.75, 2.75, -5};
+	red_wall_triangle2.vertex2 = {-2.75, -2.75, -5};
+	red_wall_triangle2.vertex3 = {-2.75, 2.75, -10.5};
+	//floor
+	Triangle floor_triangle1, floor_triangle2;
+	floor_triangle1.vertex1 = {2.75, -2.75, -5};
+	floor_triangle1.vertex2 = {2.75, -2.75, -10.5};
+	floor_triangle1.vertex3 = {-2.75, -2.75, -10.5};
+
+	floor_triangle2.vertex1 = {-2.75, -2.75, -5};
+	floor_triangle2.vertex2 = {2.75, -2.75, -5};
+	floor_triangle2.vertex3 = {-2.75, -2.75, -10.5};
+	//back wall
+	Plane back_wall;
+	back_wall.vec1 = {0, 0, 1};
+	back_wall.vec2 = {0, 0, -10.5};
+	
+}
+
+void Program::scene2()
+{
+
+}
+
 void ErrorCallback(int error, const char* description) 
 {
 	std::cout << "GLFW ERROR " << error << ":" << std::endl;
@@ -120,3 +216,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 }
+
+/*------------------------------------------------------------------*/
+
+
+
+
+

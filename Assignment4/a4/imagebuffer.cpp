@@ -79,7 +79,7 @@ bool ImageBuffer::Initialize()
         for (int j = 0; j < m_width; ++j, ++k)
         {
             int p = (i >> 4) + (j >> 4);
-            float c = 0.2 + ((p & 1) ? 0.1f : 0.0f);
+            double c = 0.2 + ((p & 1) ? 0.1f : 0.0f);
             m_imageData[k] = vec3(c);
         }
 

@@ -21,6 +21,11 @@ public:
 	//Prints system specs to the console
 	void QueryGLVersion();
 
+
+	void scene1();
+	void scene2();
+
+
 private:
 	GLFWwindow* window;
         ImageBuffer image;
