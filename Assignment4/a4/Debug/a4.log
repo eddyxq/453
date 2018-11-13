@@ -1,9 +1,2 @@
 ﻿  Program.cpp
-  imagebuffer.cpp
-c:\users\eddy\documents\github\453\assignment4\a4\imagebuffer.cpp(83): warning C4244: 'argument': conversion from 'double' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-  Generating Code...
   a4.vcxproj -> C:\Users\Eddy\Documents\GitHub\453\Assignment4\Debug\a4.exe

@@ -36,20 +36,36 @@ void Program::start()
 
 	//--------
 
+	int l = -256;
+	int r = 256;
+	int t = 256;
+	int b = -256;
+	int nx = 256 * 256;
+	int ny = 256 * 256;
+
     image.Initialize();
 	for (int i = 0; i < image.Width(); i++) 
 	{
-	  for (int j = 0; j < image.Height(); j++) 
-	  {
-		//trace my rays here
+		for (int j = 0; j < image.Height(); j++) 
+		{
+			/*
+			ray.direction <- -d w + U u + V v
+			ray.origin <- e
+			*/
 
-		// create ray
+			double u = l + (r - 1)*(i + 0.5) / nx;
+			double v = b + (t - b)*(j + 0.5) / ny;
+			double d = 443.40500673;
 
-		// get intersection
+			Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(u, v, -d));
+			ray.direction = normalize(ray);
 
-		//currently this sets every pixel to red
-	    image.SetPixel(i, j, glm::vec3(1.0, 0.0, 0.0));
-	  }
+			//std::cout << u << std::endl;
+			//std::cout << v << std::endl;
+
+			//if intersects, set pixel color
+			image.SetPixel(i, j, glm::vec3(1.0, 0.0, 0.0));
+		}
 	}
 	//Main render loop
 	while(!glfwWindowShouldClose(window))
@@ -209,6 +225,11 @@ void Program::scene2()
 	Triangle isoahedrgon20 = Triangle(glm::vec3(-1.106, 0.4472, -7), glm::vec3(-1.724, 0.4472, -7.851), glm::vec3(-2, 1, -7));
 }
 
+double Program::getMagnitude(glm::vec3 a)
+{
+	return sqrt(pow(a[0], 2) + pow(a[1], 2) + pow(a[2], 2));
+}
+
 double Program::dotProduct(glm::vec3 a, glm::vec3 b)
 {
 	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -240,6 +261,18 @@ glm::vec3 Program::getRaySphereIntersection(Ray ray, Sphere sphere)
 	glm::vec3 intersection = multiplyVector(ray.direction, closerIntersectionPoint);
 
 	return intersection;
+}
+
+glm::vec3 Program::normalize(Ray ray)
+{
+	double length = getMagnitude(ray.direction);
+	double x = ray.direction[0] / length;
+	double y = ray.direction[1] / length;
+	double z = ray.direction[2] / length;
+
+	glm::vec3 normal = {x,y,z};
+
+	return normal;
 }
 
 void ErrorCallback(int error, const char* description) 

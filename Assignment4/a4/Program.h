@@ -29,10 +29,12 @@ public:
 	//New added functions
 	void scene1();
 	void scene2();
+	double getMagnitude(glm::vec3 a);
 	double dotProduct(glm::vec3 a, glm::vec3 b);
 	glm::vec3 subtractVector(glm::vec3 a, glm::vec3 b);
 	glm::vec3 multiplyVector(glm::vec3 a, double b);
 	glm::vec3 getRaySphereIntersection(Ray ray, Sphere sphere);
+	glm::vec3 normalize(Ray ray);
 
 private:
 	GLFWwindow* window;
