@@ -2,6 +2,11 @@
 #define PROGRAM_H_
 
 #include "imagebuffer.h"
+#include "Ray.h"
+#include "Sphere.h"
+#include "Triangle.h"
+#include "Plane.h"
+#include "Light.h"
 
 //Forward declaration of classes
 //(note this is necessary because these are pointers and it allows the #include to appear in the .cpp file)
@@ -21,15 +26,17 @@ public:
 	//Prints system specs to the console
 	void QueryGLVersion();
 
-
+	//New added functions
 	void scene1();
 	void scene2();
-
+	double dotProduct(glm::vec3 a, glm::vec3 b);
+	glm::vec3 subtractVector(glm::vec3 a, glm::vec3 b);
+	glm::vec3 multiplyVector(glm::vec3 a, double b);
+	glm::vec3 getRaySphereIntersection(Ray ray, Sphere sphere);
 
 private:
 	GLFWwindow* window;
         ImageBuffer image;
-  
 };
 
 //Functions passed to GLFW to handle errors and keyboard input

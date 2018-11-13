@@ -1,5 +1,4 @@
 #include "Program.h"
-#include "Ray.h"
 #include <iostream>
 #include <string>
 #include <glad/glad.h>
@@ -7,43 +6,34 @@
 
 Program::Program() 
 {
-        setupWindow();
+	setupWindow();
 }
 
 Program::~Program() {}
 
-struct Light
-{
-	glm::vec3 vec;
-};
-
-struct Sphere
-{
-	glm::vec3 center;
-	double radius;
-};
-
-struct Plane
-{
-	glm::vec3 vec1, vec2;
-};
-
-struct Triangle
-{
-	glm::vec3 vertex1;
-	glm::vec3 vertex2;
-	glm::vec3 vertex3;
-};
-
 void Program::start() 
 {
+	
 	//code example of ray from tutorial
+	/*
 	Ray myRay = Ray(glm::vec3(0.0,0.0,0.0), glm::vec3(0.0,-1.0,-4.0));
 	glm::vec3 result = myRay.evaluate(2.0);
 
 	std::cout << result.x << std::endl;
 	std::cout << result.y << std::endl;
 	std::cout << result.z << std::endl;
+	*/
+
+	//testing calcs on assign 2a 
+	Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, -4.0));
+	Sphere sphere = Sphere(glm::vec3(0.0, 0.0, -3.0), 1.0);
+
+	glm::vec3 answer2a = getRaySphereIntersection(ray, sphere);
+
+	std::cout << answer2a[0] << std::endl;
+	std::cout << answer2a[1] << std::endl;
+	std::cout << answer2a[2] << std::endl;
+
 	//--------
 
     image.Initialize();
@@ -51,21 +41,20 @@ void Program::start()
 	{
 	  for (int j = 0; j < image.Height(); j++) 
 	  {
-	    //set pixel colors here
-
 		//trace my rays here
 
-		  // create ray
-		  // get intersection
+		// create ray
 
-		// pixel color
-	    image.SetPixel(i, j, glm::vec3(1.0, 1.0, 0.0));
+		// get intersection
+
+		//currently this sets every pixel to red
+	    image.SetPixel(i, j, glm::vec3(1.0, 0.0, 0.0));
 	  }
 	}
 	//Main render loop
 	while(!glfwWindowShouldClose(window))
 	{
-	        image.Render();
+	    image.Render();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -127,79 +116,76 @@ void Program::QueryGLVersion()
 
 void Program::scene1()
 {
-	
+	//set up scene objects
+
 	//light
-	Light light;
-	light.vec = {0, 2.5, -7.75};
+	Light light = Light(glm::vec3(0, 2.5, -7.75));
 
-	
 	//reflective grey sphere
-	Sphere sphere;
-	sphere.center = {0.9, -1.925, -6.69};
-	sphere.radius = 0.825;
+	Sphere sphere = Sphere(glm::vec3(0.9, -1.925, -6.69), 0.825);
+
 	//blue pyramid
-	Triangle pyramid_triangle1, pyramid_triangle2, pyramid_triangle3, pyramid_triangle4;
-	pyramid_triangle1.vertex1 = {-0.4, -2.75, -9.55};
-	pyramid_triangle1.vertex2 = {-0.93, 0.55, -8.51};
-	pyramid_triangle1.vertex3 = {0.11, -2.75, -7.98};
+	Triangle pyramid1 = Triangle(glm::vec3(-0.4, -2.75, -9.55), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(0.11, -2.75, -7.98));
+	Triangle pyramid2 = Triangle(glm::vec3(0.11, -2.75, -7.98), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(-1.46, -2.75, -7.47));
+	Triangle pyramid3 = Triangle(glm::vec3(-1.46, -2.75, -7.47), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(-1.97, -2.75, -9.04));
+	Triangle pyramid4 = Triangle(glm::vec3(-1.97, -2.75, -9.04), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(-0.4, -2.75, -9.55));
 
-	pyramid_triangle2.vertex1 = {0.11, -2.75, -7.98};
-	pyramid_triangle2.vertex2 = {-0.93, 0.55, -8.51};
-	pyramid_triangle2.vertex3 = {-1.46, -2.75, -7.47};
-
-	pyramid_triangle3.vertex1 = {-1.46, -2.75, -7.47};
-	pyramid_triangle3.vertex2 = {-0.93, 0.55, -8.51};
-	pyramid_triangle3.vertex3 = {-1.97, -2.75, -9.04};
-
-	pyramid_triangle4.vertex1 = {-1.97, -2.75, -9.04};
-	pyramid_triangle4.vertex2 = {-0.93, 0.55, -8.51};
-	pyramid_triangle4.vertex3 = {-0.4, -2.75, -9.55};
 	//ceiling
-	Triangle ceiling_triangle1, ceiling_triangle2;
-	ceiling_triangle1.vertex1 = {2.75, 2.75, -10.5};
-	ceiling_triangle1.vertex2 = {2.75, 2.75, -5};
-	ceiling_triangle1.vertex3 = {-2.75, 2.75, -5};
+	Triangle ceiling1 = Triangle(glm::vec3(2.75, 2.75, -10.5), glm::vec3(2.75, 2.75, -5), glm::vec3(-2.75, 2.75, -5));
+	Triangle ceiling2 = Triangle(glm::vec3(-2.75, 2.75, -10.5), glm::vec3(2.75, 2.75, -10.5), glm::vec3(-2.75, 2.75, -5));
 
-	ceiling_triangle2.vertex1 = {-2.75, 2.75, -10.5};
-	ceiling_triangle2.vertex2 = {2.75, 2.75, -10.5};
-	ceiling_triangle2.vertex3 = {-2.75, 2.75, -5};
 	//green wall
-	Triangle green_wall_triangle1, green_wall_triangle2;
-	green_wall_triangle1.vertex1 = {2.75, 2.75, -5};
-	green_wall_triangle1.vertex2 = {2.75, 2.75, -10.5};
-	green_wall_triangle1.vertex3 = {2.75, -2.75, -10.5};
+	Triangle green1 = Triangle(glm::vec3(2.75, 2.75, -5), glm::vec3(2.75, 2.75, -10.5), glm::vec3(2.75, -2.75, -10.5));
+	Triangle green2 = Triangle(glm::vec3(2.75, -2.75, -5), glm::vec3(2.75, 2.75, -5), glm::vec3(2.75, -2.75, -10.5));
 
-	green_wall_triangle2.vertex1 = {2.75, -2.75, -5};
-	green_wall_triangle2.vertex2 = {2.75, 2.75, -5};
-	green_wall_triangle2.vertex3 = {2.75, -2.75, -10.5};
 	//red wall
-	Triangle red_wall_triangle1, red_wall_triangle2;
-	red_wall_triangle1.vertex1 = {-2.75, -2.75, -5};
-	red_wall_triangle1.vertex2 = {-2.75, -2.75, -10.5};
-	red_wall_triangle1.vertex3 = {-2.75, 2.75, -10.5};
+	Triangle red1 = Triangle(glm::vec3(-2.75, -2.75, -5), glm::vec3(-2.75, -2.75, -10.5), glm::vec3(-2.75, 2.75, -10.5));
+	Triangle red2 = Triangle(glm::vec3(-2.75, 2.75, -5), glm::vec3(-2.75, -2.75, -5), glm::vec3(-2.75, 2.75, -10.5));
 
-	red_wall_triangle2.vertex1 = {-2.75, 2.75, -5};
-	red_wall_triangle2.vertex2 = {-2.75, -2.75, -5};
-	red_wall_triangle2.vertex3 = {-2.75, 2.75, -10.5};
 	//floor
-	Triangle floor_triangle1, floor_triangle2;
-	floor_triangle1.vertex1 = {2.75, -2.75, -5};
-	floor_triangle1.vertex2 = {2.75, -2.75, -10.5};
-	floor_triangle1.vertex3 = {-2.75, -2.75, -10.5};
+	Triangle floor1 = Triangle(glm::vec3(2.75, -2.75, -5), glm::vec3(2.75, -2.75, -10.5), glm::vec3(-2.75, -2.75, -10.5));
+	Triangle floor2 = Triangle(glm::vec3(-2.75, -2.75, -5), glm::vec3(2.75, -2.75, -5), glm::vec3(-2.75, -2.75, -10.5));
 
-	floor_triangle2.vertex1 = {-2.75, -2.75, -5};
-	floor_triangle2.vertex2 = {2.75, -2.75, -5};
-	floor_triangle2.vertex3 = {-2.75, -2.75, -10.5};
 	//back wall
-	Plane back_wall;
-	back_wall.vec1 = {0, 0, 1};
-	back_wall.vec2 = {0, 0, -10.5};
-	
+	Plane plane (glm::vec3(0, 0, 1),glm::vec3(0, 0, -10.5));
 }
 
 void Program::scene2()
 {
 
+}
+
+double Program::dotProduct(glm::vec3 a, glm::vec3 b)
+{
+	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+glm::vec3 Program::subtractVector(glm::vec3 a, glm::vec3 b)
+{
+	return { a[0] - b[0], a[1] - b[1], a[2] - b[2] };
+}
+
+glm::vec3 Program::multiplyVector(glm::vec3 a, double b)
+{
+	return glm::vec3(a[0]*b, a[1]*b, a[2]*b);
+}
+
+glm::vec3 Program::getRaySphereIntersection(Ray ray, Sphere sphere)
+{
+	double a, b, c;
+
+	a = dotProduct(ray.direction, ray.direction);
+	b = dotProduct(ray.direction, subtractVector(ray.origin, sphere.center)) * 2;
+	c = dotProduct(subtractVector(ray.origin, sphere.center), subtractVector(ray.origin, sphere.center)) - (sphere.radius*sphere.radius);
+
+	double t1 = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
+	double t2 = (-b - sqrt((b*b) - 4 * a*c)) / (2 * a);
+
+	double closerIntersectionPoint = min(t1, t2);
+
+	glm::vec3 intersection = multiplyVector(ray.direction, closerIntersectionPoint);
+
+	return intersection;
 }
 
 void ErrorCallback(int error, const char* description) 
