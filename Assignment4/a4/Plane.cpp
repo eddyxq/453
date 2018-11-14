@@ -2,8 +2,8 @@
 
 Plane::Plane(glm::vec3 a, glm::vec3 b)
 {
-	vec1 = a;
-	vec2 = b;
+	normal = a;
+	point = b;
 }
 
 Plane::~Plane(){}

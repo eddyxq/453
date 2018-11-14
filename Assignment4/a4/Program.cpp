@@ -1,8 +1,15 @@
 #include "Program.h"
 #include <iostream>
 #include <string>
+
+#include <glm/glm.hpp>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+bool intersectionFound;
+bool planeIntersectionFound;
+bool triangeIntersectionFound;
 
 Program::Program() 
 {
@@ -22,7 +29,6 @@ void Program::start()
 	std::cout << result.x << std::endl;
 	std::cout << result.y << std::endl;
 	std::cout << result.z << std::endl;
-	*/
 
 	//testing calcs on assign 2a 
 	Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, -4.0));
@@ -33,38 +39,92 @@ void Program::start()
 	std::cout << answer2a[0] << std::endl;
 	std::cout << answer2a[1] << std::endl;
 	std::cout << answer2a[2] << std::endl;
+	
+	//testing calcs on assign 2b
+	Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, -4.0));
+	Triangle tri = Triangle(glm::vec3(2, -1, -3), glm::vec3(-1, 3, -5), glm::vec3(-1, -1, -3));
 
+	glm::vec3 answer2b = getRayTriangleIntersection(ray, tri);
+
+	std::cout << answer2b[0] << std::endl;
+	std::cout << answer2b[1] << std::endl;
+	std::cout << answer2b[2] << std::endl;
+
+	*/
+
+	
 	//--------
 
 	int l = -256;
 	int r = 256;
 	int t = 256;
 	int b = -256;
-	int nx = 256 * 256;
-	int ny = 256 * 256;
+	int nx = 1024;
+	int ny = 1024;
 
+	Sphere sphere = Sphere(glm::vec3(0.9, -1.925, -6.69), 0.825);
+	Plane wall = Plane(glm::vec3(0, 0, 1), glm::vec3(0, 0, -10.5));
+	Triangle pyramid1 = Triangle(glm::vec3(-0.4, -2.75, -9.55), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(0.11, -2.75, -7.98));
+	Triangle pyramid2 = Triangle(glm::vec3(0.11, -2.75, -7.98), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(-1.46, -2.75, -7.47));
+	Triangle pyramid3 = Triangle(glm::vec3(-1.46, -2.75, -7.47), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(-1.97, -2.75, -9.04));
+	Triangle pyramid4 = Triangle(glm::vec3(-1.97, -2.75, -9.04), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(-0.4, -2.75, -9.55));
+	Triangle floor1 = Triangle(glm::vec3(2.75, -2.75, -5), glm::vec3(2.75, -2.75, -10.5), glm::vec3(-2.75, -2.75, -10.5));
+	Triangle floor2 = Triangle(glm::vec3(-2.75, -2.75, -5), glm::vec3(2.75, -2.75, -5), glm::vec3(-2.75, -2.75, -10.5));
     image.Initialize();
 	for (int i = 0; i < image.Width(); i++) 
 	{
 		for (int j = 0; j < image.Height(); j++) 
 		{
-			/*
+			/* from the textbook: ray equation
 			ray.direction <- -d w + U u + V v
 			ray.origin <- e
 			*/
 
-			double u = l + (r - 1)*(i + 0.5) / nx;
+			double u = l + (r - l)*(i + 0.5) / nx;
 			double v = b + (t - b)*(j + 0.5) / ny;
-			double d = 443.40500673;
+			double d = 443.40500673; //calculated distance based on 60 degrees field of view
 
-			Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(u, v, -d));
-			ray.direction = normalize(ray);
+			Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(u, v, -d)); //shoot a ray
+			//ray.direction = normalize(ray);
+			glm::normalize(ray.direction); //normalize
 
-			//std::cout << u << std::endl;
-			//std::cout << v << std::endl;
-
+			/*
+			glm::vec3 intersect = getRayPlaneIntersection(ray, wall); // for plane
+			if (planeIntersectionFound)
+			{
+				image.SetPixel(i, j, glm::vec3(1.0, 1.0, 0.0));
+			}
+			else
+			{
+				image.SetPixel(i, j, glm::vec3(0.0, 0.0, 0.0));
+			}
+			*/
+			
+			/*
+			glm::vec3 intersect = getRaySphereIntersection(ray, sphere); //for sphere
+			
 			//if intersects, set pixel color
-			image.SetPixel(i, j, glm::vec3(1.0, 0.0, 0.0));
+			if (intersectionFound) {
+				image.SetPixel(i, j, glm::vec3(1.0, 1.0, 0.0));
+				//std::cout << "intersected" << std::endl;
+			}
+			else 
+			{
+				image.SetPixel(i, j, glm::vec3(0.0, 0.0, 0.0));
+			}
+			*/
+
+			glm::vec3 intersect = getRayTriangleIntersection(ray, pyramid4); //for triangle
+
+			if (triangeIntersectionFound)
+			{
+				image.SetPixel(i, j, glm::vec3(1.0, 0.0, 0.0));
+			}
+			else
+			{
+				image.SetPixel(i, j, glm::vec3(0.0, 0.0, 0.0));
+			}
+			
 		}
 	}
 	//Main render loop
@@ -245,6 +305,43 @@ glm::vec3 Program::multiplyVector(glm::vec3 a, double b)
 	return glm::vec3(a[0]*b, a[1]*b, a[2]*b);
 }
 
+glm::vec3 Program::crossProduct(glm::vec3 a, glm::vec3 b)
+{
+	glm::vec3 cross = { a[1] * b[2] - a[2] * b[1],
+						 a[2] * b[0] - a[0] * b[2],
+						 a[0] * b[1] - a[1] * b[0] };
+
+	return cross;
+}
+
+glm::vec3 Program::getRayPlaneIntersection(Ray ray, Plane plane)
+{
+
+	double numerator = dotProduct(subtractVector(plane.point, ray.origin), plane.normal);
+
+	double denominator = dotProduct(ray.direction, plane.normal);
+
+	
+
+	if (denominator == 0)
+	{
+		planeIntersectionFound = false;
+		return glm::vec3(0.0, 0.0, 0.0);
+	}
+
+	double t = numerator / denominator;
+
+	if (t >= 0)
+	{
+		planeIntersectionFound = true;
+	}
+	else
+	{
+		planeIntersectionFound = false;
+	}
+	return multiplyVector(ray.direction, t);
+}
+
 glm::vec3 Program::getRaySphereIntersection(Ray ray, Sphere sphere)
 {
 	double a, b, c;
@@ -253,14 +350,86 @@ glm::vec3 Program::getRaySphereIntersection(Ray ray, Sphere sphere)
 	b = dotProduct(ray.direction, subtractVector(ray.origin, sphere.center)) * 2;
 	c = dotProduct(subtractVector(ray.origin, sphere.center), subtractVector(ray.origin, sphere.center)) - (sphere.radius*sphere.radius);
 
-	double t1 = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
-	double t2 = (-b - sqrt((b*b) - 4 * a*c)) / (2 * a);
+	//float t1 = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
+	//float t2 = (-b - sqrt((b*b) - 4 * a*c)) / (2 * a);
 
-	double closerIntersectionPoint = min(t1, t2);
+	double discriminant = b * b - 4 * a*c;
 
-	glm::vec3 intersection = multiplyVector(ray.direction, closerIntersectionPoint);
+	if (discriminant > 0.0) 
+	{
+		intersectionFound = true;
+		float t1 = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
+		float t2 = (-b - sqrt((b*b) - 4 * a*c)) / (2 * a);
+		double closerIntersectionPoint = glm::min(t1, t2);
+		glm::vec3 intersection = multiplyVector(ray.direction, closerIntersectionPoint);
+		return intersection;
+	}
+	else if (discriminant == 0)
+	{
+		intersectionFound = true;
+		float closerIntersectionPoint = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
+		glm::vec3 intersection = multiplyVector(ray.direction, closerIntersectionPoint);
+		return intersection;
+	}
+	else
+	{
+		intersectionFound = false;
+		return glm::vec3(0.0, 0.0, 0.0);
+	}
+}
 
-	return intersection;
+glm::vec3 Program::getRayTriangleIntersection(Ray ray, Triangle triangle)
+{
+	glm::vec3 x = subtractVector(triangle.p1, triangle.p0); //p1 - p0
+	glm::vec3 y = subtractVector(triangle.p2, triangle.p0); //p2 - p0
+
+	glm::vec3 temp = crossProduct(x, y); //cross product
+
+	double n = sqrt(temp[0] * temp[0] + temp[1] * temp[1] + temp[2] * temp[2]);
+
+	glm::vec3 normal = { temp[0] / n, temp[1] / n, temp[2] / n };
+
+	Plane tPlane = Plane(normal, triangle.p0);
+
+
+
+	glm::vec3 intersectionP = getRayPlaneIntersection(ray, tPlane);
+
+	double numerator = dotProduct(subtractVector(tPlane.point, ray.origin), tPlane.normal);
+	double denominator = dotProduct(ray.direction, tPlane.normal);
+
+	if (denominator == 0)
+	{
+		planeIntersectionFound = false;
+		return glm::vec3(0.0, 0.0, 0.0);
+	}
+
+	double t = numerator / denominator;
+
+	glm::vec3 pT = subtractVector(intersectionP, triangle.p0); //intersectionP - p0
+
+	double area = n / 2;
+
+	glm::vec3 a1 = crossProduct(pT, x);
+	glm::vec3 a2 = crossProduct(pT, y);
+
+	double area1 = getMagnitude(a1)/2;
+	double area2 = getMagnitude(a2)/2;
+
+	double u = area1 / area;
+	double v = area2 / area;
+	double w = (1 - u - v);
+
+	if ((u >= 0 && u <= 1) && (v >= 0 && v <= 1) && (w >= 0 && w <= 1) && (t > 0) && ((u + v)<=1))
+	{
+		triangeIntersectionFound = true;
+		return intersectionP;
+	}
+	else 
+	{
+		triangeIntersectionFound = false;
+		return glm::vec3(0.0, 0.0, 0.0);
+	}
 }
 
 glm::vec3 Program::normalize(Ray ray)

@@ -8,8 +8,8 @@ class Plane
 		Plane(glm::vec3 a, glm::vec3 b);
 		virtual ~Plane();
 
-		glm::vec3 vec1;
-		glm::vec3 vec2;
+		glm::vec3 normal;
+		glm::vec3 point;
 };
 
 #endif /* PLANE_H_ */

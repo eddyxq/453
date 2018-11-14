@@ -33,7 +33,12 @@ public:
 	double dotProduct(glm::vec3 a, glm::vec3 b);
 	glm::vec3 subtractVector(glm::vec3 a, glm::vec3 b);
 	glm::vec3 multiplyVector(glm::vec3 a, double b);
+
+	glm::vec3 crossProduct(glm::vec3 a, glm::vec3 b);
+
+	glm::vec3 getRayPlaneIntersection(Ray ray, Plane plane);
 	glm::vec3 getRaySphereIntersection(Ray ray, Sphere sphere);
+	glm::vec3 getRayTriangleIntersection(Ray ray, Triangle triangle);
 	glm::vec3 normalize(Ray ray);
 
 private:

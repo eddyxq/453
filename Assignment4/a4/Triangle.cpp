@@ -2,9 +2,9 @@
 
 Triangle::Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c)
 {
-	p1 = a;
-	p2 = b;
-	p3 = c;
+	p0 = a;
+	p1 = b;
+	p2 = c;
 }
 
 Triangle::~Triangle(){}
