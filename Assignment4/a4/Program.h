@@ -36,9 +36,9 @@ public:
 
 	glm::vec3 crossProduct(glm::vec3 a, glm::vec3 b);
 
-	glm::vec3 getRayPlaneIntersection(Ray ray, Plane plane);
-	glm::vec3 getRaySphereIntersection(Ray ray, Sphere sphere);
-	glm::vec3 getRayTriangleIntersection(Ray ray, Triangle triangle);
+	double getRayPlaneIntersection(Ray ray, Plane plane);
+	double getRaySphereIntersection(Ray ray, Sphere sphere);
+	double getRayTriangleIntersection(Ray ray, Triangle triangle);
 	glm::vec3 normalize(Ray ray);
 
 private:

@@ -10,6 +10,7 @@ class Plane
 
 		glm::vec3 normal;
 		glm::vec3 point;
+		glm::vec3 color;
 };
 
 #endif /* PLANE_H_ */

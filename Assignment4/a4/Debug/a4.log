@@ -1,5 +1,2 @@
 ﻿  Program.cpp
-c:\users\eddy\desktop\github\453\assignment4\a4\program.cpp(361): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\eddy\desktop\github\453\assignment4\a4\program.cpp(362): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\eddy\desktop\github\453\assignment4\a4\program.cpp(370): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   a4.vcxproj -> C:\Users\eddy\Desktop\GitHub\453\Assignment4\Debug\a4.exe

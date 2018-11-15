@@ -10,6 +10,7 @@ class Sphere
 
 		glm::vec3 center;
 		double radius;
+		glm::vec3 color;
 };
 
 #endif /* SPHERE_H_ */
