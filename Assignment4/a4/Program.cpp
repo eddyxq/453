@@ -18,8 +18,8 @@ Program::~Program() {}
 
 void Program::start() 
 {
-	//scene1();
-	scene2();
+	scene1();
+	//scene2();
 }
 
 void Program::QueryGLVersion() 
@@ -40,10 +40,12 @@ void Program::scene1()
 
 	glm::vec3 grey = glm::vec3(0.8784, 0.8784, 0.8784);
 	glm::vec3 lightGrey = glm::vec3(0.6274, 0.6274, 0.6274);
+	glm::vec3 cyan = glm::vec3(0.0, 0.6, 0.6);
+	glm::vec3 green = glm::vec3(0, 1, 0);
+	glm::vec3 red = glm::vec3(1, 0, 0);
 
 	//reflective grey sphere
 	Sphere sphere = Sphere(glm::vec3(0.9, -1.925, -6.69), 0.825);
-
 	sphere.color = lightGrey;
 
 	//blue pyramid
@@ -51,8 +53,6 @@ void Program::scene1()
 	Triangle pyramid2 = Triangle(glm::vec3(0.11, -2.75, -7.98), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(-1.46, -2.75, -7.47));
 	Triangle pyramid3 = Triangle(glm::vec3(-1.46, -2.75, -7.47), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(-1.97, -2.75, -9.04));
 	Triangle pyramid4 = Triangle(glm::vec3(-1.97, -2.75, -9.04), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(-0.4, -2.75, -9.55));
-
-	glm::vec3 cyan = glm::vec3(0.0, 0.6, 0.6);
 	pyramid1.color = cyan;
 	pyramid2.color = cyan;
 	pyramid3.color = cyan;
@@ -61,40 +61,32 @@ void Program::scene1()
 	//ceiling
 	Triangle ceiling1 = Triangle(glm::vec3(2.75, 2.75, -10.5), glm::vec3(2.75, 2.75, -5), glm::vec3(-2.75, 2.75, -5));
 	Triangle ceiling2 = Triangle(glm::vec3(-2.75, 2.75, -10.5), glm::vec3(2.75, 2.75, -10.5), glm::vec3(-2.75, 2.75, -5));
-
 	ceiling1.color = grey;
 	ceiling2.color = grey;
 
 	//green wall
 	Triangle green1 = Triangle(glm::vec3(2.75, 2.75, -5), glm::vec3(2.75, 2.75, -10.5), glm::vec3(2.75, -2.75, -10.5));
 	Triangle green2 = Triangle(glm::vec3(2.75, -2.75, -5), glm::vec3(2.75, 2.75, -5), glm::vec3(2.75, -2.75, -10.5));
-
-	glm::vec3 green = glm::vec3(0, 1, 0);
 	green1.color = green;
 	green2.color = green;
 
 	//red wall
 	Triangle red1 = Triangle(glm::vec3(-2.75, -2.75, -5), glm::vec3(-2.75, -2.75, -10.5), glm::vec3(-2.75, 2.75, -10.5));
 	Triangle red2 = Triangle(glm::vec3(-2.75, 2.75, -5), glm::vec3(-2.75, -2.75, -5), glm::vec3(-2.75, 2.75, -10.5));
-
-	glm::vec3 red = glm::vec3(1, 0, 0);
 	red1.color = red;
 	red2.color = red;
 
 	//floor
 	Triangle floor1 = Triangle(glm::vec3(2.75, -2.75, -5), glm::vec3(2.75, -2.75, -10.5), glm::vec3(-2.75, -2.75, -10.5));
 	Triangle floor2 = Triangle(glm::vec3(-2.75, -2.75, -5), glm::vec3(2.75, -2.75, -5), glm::vec3(-2.75, -2.75, -10.5));
-
 	floor1.color = grey;
 	floor2.color = grey;
 
 	//back wall
 	Plane wall = Plane(glm::vec3(0, 0, 1), glm::vec3(0, 0, -10.5));
-
 	wall.color = grey;
 
 	Triangle triangle_array[12] = { red1, red2, green1, green2, floor1, floor2, ceiling1, ceiling2, pyramid1, pyramid2, pyramid3, pyramid4 };
-
 
 	//--------
 
@@ -106,6 +98,7 @@ void Program::scene1()
 	int ny = 1024;
 
 	image.Initialize();
+	//ran per pixel
 	for (int i = 0; i < image.Width(); i++)
 	{
 		for (int j = 0; j < image.Height(); j++)
@@ -115,38 +108,35 @@ void Program::scene1()
 			ray.origin <- e
 			*/
 
+			//setting up the camera
 			double u = l + (r - l)*(i + 0.5) / nx;
 			double v = b + (t - b)*(j + 0.5) / ny;
 			double d = 443.40500673; //calculated distance based on 60 degrees field of view
-
+			
 			Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(u, v, -d)); //shoot a ray
-			//ray.direction = normalize(ray);
 			glm::normalize(ray.direction); //normalize
 
-
-			double planeTime = getRayPlaneIntersection(ray, wall); //for sphere
+			//intersect ray and plane
+			double planeTime = getRayPlaneIntersection(ray, wall); 
 			if (planeIntersectionFound)
 			{
 				image.SetPixel(i, j, wall.color);
 			}
-
+			//intersect ray and triangle
 			for (Triangle t : triangle_array)
 			{
-				double triangleTime = getRayTriangleIntersection(ray, t); //for triangle
-
+				double triangleTime = getRayTriangleIntersection(ray, t); 
 				if (triangeIntersectionFound)
 				{
 					image.SetPixel(i, j, t.color);
 				}
 			}
-
-			double sphereTime = getRaySphereIntersection(ray, sphere); //for sphere
+			//intersect ray and sphere
+			double sphereTime = getRaySphereIntersection(ray, sphere); 
 			if (sphereIntersectionFound)
 			{
 				image.SetPixel(i, j, sphere.color);
 			}
-
-
 		}
 	}
 	//Main render loop
@@ -200,7 +190,7 @@ void Program::setupWindow() {
 
 void Program::scene2()
 {
-	//set up scene objects
+	//set up scene2 objects
 
 	glm::vec3 green = { 0,1,0 };
 	glm::vec3 lightGrey = { 0.6274,0.6274,0.6274 };
@@ -246,7 +236,6 @@ void Program::scene2()
 	Triangle cone10 = Triangle(glm::vec3(-0.8, -1, -5), glm::vec3(0, 0.6, -5), glm::vec3(-0.6928, -1, -5.4));
 	Triangle cone11 = Triangle(glm::vec3(-0.6928, -1, -5.4), glm::vec3(0, 0.6, -5), glm::vec3(-0.4, -1, -5.693));
 	Triangle cone12 = Triangle(glm::vec3(-0.4, -1, -5.693), glm::vec3(0, 0.6, -5), glm::vec3(0, -1, -5.8));
-
 	cone1.color = green;
 	cone2.color = green;
 	cone3.color = green;
@@ -281,7 +270,6 @@ void Program::scene2()
 	Triangle isoahedrgon18 = Triangle(glm::vec3(-2.724, 0.4472, -7.526), glm::vec3(-2.724, 0.4472, -6.474), glm::vec3(-2, 1, -7));
 	Triangle isoahedrgon19 = Triangle(glm::vec3(-1.724, 0.4472, -7.851), glm::vec3(-2.724, 0.4472, -7.526), glm::vec3(-2, 1, -7));
 	Triangle isoahedrgon20 = Triangle(glm::vec3(-1.106, 0.4472, -7), glm::vec3(-1.724, 0.4472, -7.851), glm::vec3(-2, 1, -7));
-
 	isoahedrgon1.color = red;
 	isoahedrgon2.color = red;
 	isoahedrgon3.color = red;
@@ -309,11 +297,7 @@ void Program::scene2()
 								   isoahedrgon16, isoahedrgon17 , isoahedrgon18 , isoahedrgon19 , isoahedrgon20,
 								   cone1, cone2, cone3, cone4, cone5, cone6, cone7, cone8, cone9, cone10, cone11,
 								   cone12};
-								  
-
-
 	Sphere sphere_array[3] = { purpleSphere, greySphere, yellowSphere };
-	
 	Plane plane_array[2] = { wall, floor };
 
 	//--------
@@ -326,6 +310,7 @@ void Program::scene2()
 	int ny = 1024;
 
 	image.Initialize();
+	//ran per pixel
 	for (int i = 0; i < image.Width(); i++)
 	{
 		for (int j = 0; j < image.Height(); j++)
@@ -335,22 +320,22 @@ void Program::scene2()
 			ray.origin <- e
 			*/
 
+			//set up camera
 			double u = l + (r - l)*(i + 0.5) / nx;
 			double v = b + (t - b)*(j + 0.5) / ny;
 			double d = 443.40500673; //calculated distance based on 60 degrees field of view
 
 			Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(u, v, -d)); //shoot a ray
-			//ray.direction = normalize(ray);
 			glm::normalize(ray.direction); //normalize
 
-			/*for (Plane p : plane_array)
+			for (Plane p : plane_array)
 			{
 				double planeTime = getRayPlaneIntersection(ray, p); //for plane
 				if (planeIntersectionFound)
 				{
 					image.SetPixel(i, j, p.color);
 				}
-			}*/
+			}
 
 			for (Triangle t : triangle_array)
 			{
@@ -361,8 +346,7 @@ void Program::scene2()
 					image.SetPixel(i, j, t.color);
 				}
 			}
-
-			/*
+			
 			for (Sphere s : sphere_array)
 			{
 				double sphereTime = getRaySphereIntersection(ray, s); //for sphere
@@ -371,7 +355,7 @@ void Program::scene2()
 					image.SetPixel(i, j, s.color);
 				}
 			}
-			*/
+			
 		}
 	}
 	//Main render loop
@@ -406,27 +390,31 @@ glm::vec3 Program::multiplyVector(glm::vec3 a, double b)
 glm::vec3 Program::crossProduct(glm::vec3 a, glm::vec3 b)
 {
 	glm::vec3 cross = { a[1] * b[2] - a[2] * b[1],
-						 a[2] * b[0] - a[0] * b[2],
-						 a[0] * b[1] - a[1] * b[0] };
-
+						a[2] * b[0] - a[0] * b[2],
+						a[0] * b[1] - a[1] * b[0] };
 	return cross;
 }
 
 double Program::getRayPlaneIntersection(Ray ray, Plane plane)
 {
+	/*
+	ray-plane intersectionformula: (o + t(d) - p) . n = 0
+	re-arrange for t, we get: t = (p - o) . n / (d . n)
+	*/
 
-	double numerator = dotProduct(subtractVector(plane.point, ray.origin), plane.normal); //(point - origin) . n
-
-	double denominator = dotProduct(ray.direction, plane.normal); //d . n
-
-	if (denominator == 0) {
+	double numerator = dotProduct(subtractVector(plane.point, ray.origin), plane.normal); // (point - origin) . n
+	double denominator = dotProduct(ray.direction, plane.normal); // d . n
+	// check for division by 0 error
+	if (denominator == 0) 
+	{
+		//set intersection flags, returns -1 if no intersection
 		triangeIntersectionFound = false;
 		planeIntersectionFound = false;
 		return -1;
 	}
-
+	// ((point - origin) . n) / (d . n)
 	double t = numerator / denominator;
-
+	// check for positive t intersections, sets flags appropriately
 	if (t >= 0)
 	{
 		planeIntersectionFound = true;
@@ -441,17 +429,18 @@ double Program::getRayPlaneIntersection(Ray ray, Plane plane)
 
 double Program::getRaySphereIntersection(Ray ray, Sphere sphere)
 {
-	double a, b, c;
+	/* 
+	ray-sphere intersection formula: (o + t(d) - c) . (o + t(d) - c) - r^2 = 0
+	*/
 
+	double a, b, c;
+	//calculate coefficients
 	a = dotProduct(ray.direction, ray.direction);
 	b = dotProduct(ray.direction, subtractVector(ray.origin, sphere.center)) * 2;
 	c = dotProduct(subtractVector(ray.origin, sphere.center), subtractVector(ray.origin, sphere.center)) - (sphere.radius*sphere.radius);
-
-	//float t1 = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
-	//float t2 = (-b - sqrt((b*b) - 4 * a*c)) / (2 * a);
-
+	//check values under the square root to determine the number of intersections
 	double discriminant = b * b - 4 * a*c;
-
+	//when positive there is 2 intersections
 	if (discriminant > 0.0) 
 	{
 		sphereIntersectionFound = true;
@@ -461,6 +450,7 @@ double Program::getRaySphereIntersection(Ray ray, Sphere sphere)
 		glm::vec3 intersection = multiplyVector(ray.direction, closerIntersectionPoint);
 		return closerIntersectionPoint;
 	}
+	//when 0 there is 1 intersection
 	else if (discriminant == 0)
 	{
 		sphereIntersectionFound = true;
@@ -468,6 +458,7 @@ double Program::getRaySphereIntersection(Ray ray, Sphere sphere)
 		glm::vec3 intersection = multiplyVector(ray.direction, closerIntersectionPoint);
 		return closerIntersectionPoint;
 	}
+	//when negative there is no intersection
 	else
 	{
 		sphereIntersectionFound = false;
@@ -480,11 +471,11 @@ double Program::getRayTriangleIntersection(Ray ray, Triangle triangle)
 	glm::vec3 x = subtractVector(triangle.p1, triangle.p0); //p1 - p0
 	glm::vec3 y = subtractVector(triangle.p2, triangle.p0); //p2 - p0
 
-	glm::vec3 temp = crossProduct(x, y); //cross product
+	glm::vec3 planeNormal = crossProduct(x, y); //cross product
 
-	double n = getMagnitude(temp);
+	double n = getMagnitude(planeNormal);// ||N||
 
-	glm::vec3 normal = { temp[0] / n, temp[1] / n, temp[2] / n };
+	glm::vec3 normal = { planeNormal[0] / n, planeNormal[1] / n, planeNormal[2] / n }; // n = N / ||N||
 
 	Plane tPlane = Plane(normal, triangle.p0);
 
@@ -505,33 +496,18 @@ double Program::getRayTriangleIntersection(Ray ray, Triangle triangle)
 	double t = numerator / denominator;
 
 	glm::vec3 pT = intersectionP;
-		//subtractVector(intersectionP, triangle.p0); //intersectionP - p0
 
 	double area = n / 2.0;
-
-	//std::cout << area << std::endl;
-
-	//std::cout << pT.x << " " << pT.y << " " << pT.z << std::endl;
-	//std::cout << triangle.p1.x << " " << triangle.p1.y << " " << triangle.p1.z << std::endl;
-	//std::cout << triangle.p2.x << " " << triangle.p2.y << " " << triangle.p2.z << std::endl;
 
 	glm::vec3 a1 = crossProduct(pT - triangle.p0, triangle.p2 - triangle.p0);
 	glm::vec3 a2 = crossProduct(pT - triangle.p0, triangle.p1 - triangle.p0);
 
-	//std::cout << a1.x << " " << a1.y << " " << a1.z << std::endl;
-	//std::cout << a2.x << " " << a2.y << " " << a2.z << std::endl;
-
 	double area1 = getMagnitude(a1)/2.0;
 	double area2 = getMagnitude(a2)/2.0;
-
-	//std::cout << area1 << std::endl;
-	//std::cout << area2 << std::endl;
 
 	double u = area1 / area;
 	double v = area2 / area;
 	double w = (1.0 - u - v);
-
-	//std::cout << u << " " << v << " " << w << std::endl;
 
 	if ((u >= 0.0 && u <= 1.0) && (v >= 0.0 && v <= 1.0) && (w >= 0.0 && w <= 1.0) && (t > 0.0) && ((u + v + w) <= 1.0) && ((u + v + w) >= 0.0))
 	{
@@ -542,11 +518,11 @@ double Program::getRayTriangleIntersection(Ray ray, Triangle triangle)
 			triangeIntersectionFound = true;
 			return t;
 		}
-		else { //maybe delete
+		else 
+		{ 
 			triangeIntersectionFound = false;
 			return -1;
 		}
-		
 	}
 	else 
 	{
