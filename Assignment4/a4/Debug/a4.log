@@ -1,5 +1,4 @@
 ﻿  Program.cpp
-  main.cpp
-  Generating Code...
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
-  a4.vcxproj -> C:\Users\Eddy\Documents\GitHub\453\Assignment4\Debug\a4.exe
+c:\users\eddy\desktop\github\453\assignment4\a4\program.cpp(605): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\eddy\desktop\github\453\assignment4\a4\program.cpp(628): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  a4.vcxproj -> C:\Users\eddy\Desktop\GitHub\453\Assignment4\Debug\a4.exe

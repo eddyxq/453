@@ -35,8 +35,38 @@ void Program::start()
 	init_scene2();
 	init_scene3();
 
+	/*
+	//-----testing part3
+	int l = -256;
+	int r = 256;
+	int t = 256;
+	int b = -256;
+	int nx = 1024;
+	int ny = 1024;
+
+	double i = 0;
+	double j = 0;
+
+	double u = l + (r - l)*(i + 0.5) / nx;
+	double v = b + (t - b)*(j + 0.5) / ny;
+	double d = 443.40500673; //calculated distance based on 60 degrees field of view
+	Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(u, v, -d)); //shoot a ray
+	glm::normalize(ray.direction); //normalize
+	Light light = Light(glm::vec3(0, 2.5, -7.75));
+	Sphere sphere = Sphere(glm::vec3(0.9, -1.925, -6.69), 0.825);
+	sphere.color = glm::vec3(1, 0, 0); //red
+
+	glm::vec3 newColor = applyShadingEffect(ray, sphere, light, 10);
+
+	std::cout << newColor[0] << std::endl;
+	std::cout << newColor[1] << std::endl;
+	std::cout << newColor[2] << std::endl;
+	*/
+
 	//ray trace the scene
-	displayScene(2);
+	displayScene(1);
+
+	//-----
 
 }
 
@@ -295,7 +325,7 @@ void Program::displayScene(int scene_number)
 	int b = -256;
 	int nx = 1024;
 	int ny = 1024;
-
+	Light light = Light(glm::vec3(0, 2.5, -7.75));
 	image.Initialize();
 	//ran per pixel
 	for (int i = 0; i < image.Width(); i++)
@@ -320,6 +350,7 @@ void Program::displayScene(int scene_number)
 				double planeTime = getRayPlaneIntersection(ray, p); //for plane
 				if (planeIntersectionFound)
 				{
+
 					image.SetPixel(i, j, p.color);
 				}
 			}
@@ -339,7 +370,10 @@ void Program::displayScene(int scene_number)
 				double sphereTime = getRaySphereIntersection(ray, s); //for sphere
 				if (sphereIntersectionFound)
 				{
-					image.SetPixel(i, j, s.color);
+					glm::vec3 color = applyShadingEffect(ray, s, light, 10);
+
+
+					image.SetPixel(i, j, color);
 				}
 			}
 		}
@@ -543,46 +577,68 @@ glm::vec3 Program::applyShadingEffect(Ray ray, Sphere sphere, Light light, int n
 	*/
 	//--------------------------------------------------------------------------------------------------------------
 
+	
+
 	//kd = diffuse coefficient (surface color)
-	glm::vec3 kd = sphere.color;
+	float kd = 0.2f;
+
+	//ka 
+	//glm::vec3 ka = kd;
+
 	//I = intensity of the light source
-	double I = light.intensity;
+	//double I = light.intensity;
+
+	glm::vec3 I = { 1,1,1 };
+
+	//Ia 
+	//double Ia = I;
 	
 	//l - light source position - intersection point
-	glm::vec3 l = subtractVector(light.position, sphereIntersection);
+	glm::vec3 l = sphereIntersection - light.position;
+	glm::normalize(l);
 
 	//calculation for the normal might be wrong
-	glm::vec3 normal = glm::vec3{ 1,1,1 }; //not sure if this is correct, assuming normal is a unit vector here
+	glm::vec3 normal = -(sphereIntersection - sphere.center);
+	glm::normalize(normal);
 
 	//get max of 0 and n . l
-	double max_diffuse = (dotProduct(normal, l) > 0) ? dotProduct(normal, l) : 0;
+	float max_diffuse = (dotProduct(normal, l) > 0) ? dotProduct(normal, l) : 0;
 	
 	//kd * I * max(0, normal . l))
-	glm::vec3 diffuse_component = multiplyVector(multiplyVector(kd, I), max_diffuse);
+	//glm::vec3 diffuse_component = multiplyVector(multiplyVector(kd, I), max_diffuse);
+	glm::vec3 diffuse_component = max_diffuse * I * kd;
+
+	
 
 	//choosing a specular color
-	glm::vec3 ks = { 0.5, 0.5, 0.5 };
+	float ks = 1.0f;
 
 	//choosing a exponent
-	double p = 100; //p = Phong exponent
+	double p = 8; //p = Phong exponent
 
 	//calculations for v and h
-	glm::vec3 v = multiplyVector(-sphereIntersection, (1 / getMagnitude(sphereIntersection)));
+	glm::vec3 v = sphereIntersection - ray.origin;
+	glm::normalize(v);
 
 	//h = (v+l) / (||v+l||)
-	glm::vec3 h = multiplyVector(subtractVector(v, -l), 1/getMagnitude((subtractVector(v, -l))));
+	//glm::vec3 h = multiplyVector(subtractVector(v, -l), 1/getMagnitude((subtractVector(v, -l
+	glm::vec3 h = (v + l) / glm::length(v + l);
 
 	//max of 0 and (normal . h)^p
-	double max_specular = pow(dotProduct(normal, h), p) > 0 ? pow(dotProduct(normal, h), p) : 0;
+	float max_specular = pow(dotProduct(normal, h), p) > 0 ? pow(dotProduct(normal, h), p) : 0;
 
+	std::cout << max_specular << std::endl;
 	//ks * I * max(0, (normal . h)^p)
-	glm::vec3 specular_component = multiplyVector(multiplyVector(ks, I), max_specular);
+	//glm::vec3 specular_component = multiplyVector(multiplyVector(ks, I), max_specular);
+	glm::vec3 specular_component = max_specular * ks * I;
 
 	//putting the whole thing together, diffuse + specular
 	//L = kd * I * max(0, dot(normal, l)) + ks * I * max(0, pow(dot(normal, h), p));
-	glm::vec3 L = subtractVector(diffuse_component, -specular_component);
+	glm::vec3 L = diffuse_component + specular_component;
 	
 	return L;
+
+	//return diffuse_component;
 }
 
 void ErrorCallback(int error, const char* description) 
