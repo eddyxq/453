@@ -43,6 +43,8 @@ public:
 	double getRaySphereIntersection(Ray ray, Sphere sphere);
 	double getRayTriangleIntersection(Ray ray, Triangle triangle);
 
+	glm::vec3 applyShadingEffect(Ray ray, Sphere sphere, Light light, int n);
+
 private:
 	GLFWwindow* window;
         ImageBuffer image;

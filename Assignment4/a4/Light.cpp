@@ -1,8 +1,9 @@
 #include "Light.h"
 
-Light::Light(glm::vec3 a)
+Light::Light(glm::vec3 p)
 {
-	vec1 = a;
+	position = p;
+	intensity = 0.5;
 }
 
 Light::~Light(){}

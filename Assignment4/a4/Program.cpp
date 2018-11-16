@@ -17,6 +17,10 @@ std::vector<Triangle> scene2_triangles;
 std::vector<Sphere> scene2_spheres;
 std::vector<Plane> scene2_planes;
 
+glm::vec3 sphereIntersection;
+glm::vec3 planeIntersection;
+glm::vec3 triangleIntersection;
+
 Program::Program() 
 {
 	setupWindow();
@@ -390,8 +394,8 @@ double Program::getRayPlaneIntersection(Ray ray, Plane plane)
 	if (denominator == 0) 
 	{
 		//set intersection flags, returns -1 if no intersection
-		triangeIntersectionFound = false;
 		planeIntersectionFound = false;
+		planeIntersection = glm::vec3{ 0,0,0 };
 		return -1;
 	}
 	// ((point - origin) . n) / (d . n)
@@ -400,11 +404,12 @@ double Program::getRayPlaneIntersection(Ray ray, Plane plane)
 	if (t >= 0)
 	{
 		planeIntersectionFound = true;
+		planeIntersection = multiplyVector(ray.direction, t);
 	}
 	else
 	{
-		triangeIntersectionFound = false;
 		planeIntersectionFound = false;
+		planeIntersection = glm::vec3{ 0,0,0 };
 	}
 	return t;
 }
@@ -430,6 +435,7 @@ double Program::getRaySphereIntersection(Ray ray, Sphere sphere)
 		double t2 = (-b - sqrt((b*b) - 4 * a*c)) / (2 * a);
 		double closerIntersectionPoint = glm::min(t1, t2);
 		glm::vec3 intersection = multiplyVector(ray.direction, closerIntersectionPoint);
+		sphereIntersection = intersection;
 		return closerIntersectionPoint;
 	}
 	//when 0 there is 1 intersection
@@ -438,12 +444,14 @@ double Program::getRaySphereIntersection(Ray ray, Sphere sphere)
 		sphereIntersectionFound = true;
 		double closerIntersectionPoint = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
 		glm::vec3 intersection = multiplyVector(ray.direction, closerIntersectionPoint);
+		sphereIntersection = intersection;
 		return closerIntersectionPoint;
 	}
 	//when negative there is no intersection
 	else
 	{
 		sphereIntersectionFound = false;
+		sphereIntersection = glm::vec3{ 0,0,0 };
 		return -1;
 	}
 }
@@ -472,6 +480,7 @@ double Program::getRayTriangleIntersection(Ray ray, Triangle triangle)
 	{
 		triangeIntersectionFound = false;
 		planeIntersectionFound = false;
+		planeIntersection = glm::vec3{ 0,0,0 };
 		return -1;
 	}
 
@@ -498,19 +507,82 @@ double Program::getRayTriangleIntersection(Ray ray, Triangle triangle)
 			(std::abs((w * triangle.p0.z + u * triangle.p1.z + v * triangle.p2.z) - pT.z) < 0.00001))
 		{
 			triangeIntersectionFound = true;
+			triangleIntersection = intersectionP;
 			return t;
 		}
 		else 
 		{ 
 			triangeIntersectionFound = false;
+			triangleIntersection = glm::vec3{ 0,0,0 };
 			return -1;
 		}
 	}
 	else 
 	{
 		triangeIntersectionFound = false;
+		triangleIntersection = glm::vec3{ 0,0,0 };
 		return -1;
 	}
+}
+
+glm::vec3 Program::applyShadingEffect(Ray ray, Sphere sphere, Light light, int n)
+{
+	//light calculations
+
+	/*--------------------------------------------------------------------------------------------------------------
+	From textbook
+
+	Typical values of p:
+	10—“eggshell”;
+	100—mildly shiny;
+	1000—really glossy;
+	10,000—nearlymirror-like.
+
+	L = kd I max(0, n · l) + ks I max(0, n · h)p
+
+	*/
+	//--------------------------------------------------------------------------------------------------------------
+
+	//kd = diffuse coefficient (surface color)
+	glm::vec3 kd = sphere.color;
+	//I = intensity of the light source
+	double I = light.intensity;
+	
+	//l - light source position - intersection point
+	glm::vec3 l = subtractVector(light.position, sphereIntersection);
+
+	//calculation for the normal might be wrong
+	glm::vec3 normal = glm::vec3{ 1,1,1 }; //not sure if this is correct, assuming normal is a unit vector here
+
+	//get max of 0 and n . l
+	double max_diffuse = (dotProduct(normal, l) > 0) ? dotProduct(normal, l) : 0;
+	
+	//kd * I * max(0, normal . l))
+	glm::vec3 diffuse_component = multiplyVector(multiplyVector(kd, I), max_diffuse);
+
+	//choosing a specular color
+	glm::vec3 ks = { 0.5, 0.5, 0.5 };
+
+	//choosing a exponent
+	double p = 100; //p = Phong exponent
+
+	//calculations for v and h
+	glm::vec3 v = multiplyVector(-sphereIntersection, (1 / getMagnitude(sphereIntersection)));
+
+	//h = (v+l) / (||v+l||)
+	glm::vec3 h = multiplyVector(subtractVector(v, -l), 1/getMagnitude((subtractVector(v, -l))));
+
+	//max of 0 and (normal . h)^p
+	double max_specular = pow(dotProduct(normal, h), p) > 0 ? pow(dotProduct(normal, h), p) : 0;
+
+	//ks * I * max(0, (normal . h)^p)
+	glm::vec3 specular_component = multiplyVector(multiplyVector(ks, I), max_specular);
+
+	//putting the whole thing together, diffuse + specular
+	//L = kd * I * max(0, dot(normal, l)) + ks * I * max(0, pow(dot(normal, h), p));
+	glm::vec3 L = subtractVector(diffuse_component, -specular_component);
+	
+	return L;
 }
 
 void ErrorCallback(int error, const char* description) 

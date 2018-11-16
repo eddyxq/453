@@ -5,10 +5,13 @@
 class Light
 {
 	public:
-		Light(glm::vec3 a);
+		Light(glm::vec3 p);
 		virtual ~Light();
 
-		glm::vec3 vec1;
+		glm::vec3 position;
+		double intensity;
+
+
 };
 
 #endif /* LIGHT_H_ */
