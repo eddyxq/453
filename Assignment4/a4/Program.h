@@ -27,19 +27,21 @@ public:
 	void QueryGLVersion();
 
 	//New added functions
-	void scene1();
-	void scene2();
+	void init_scene1();
+	void init_scene2();
+	void init_scene3();
+
+	void displayScene(int scene_number);
+
 	double getMagnitude(glm::vec3 a);
 	double dotProduct(glm::vec3 a, glm::vec3 b);
 	glm::vec3 subtractVector(glm::vec3 a, glm::vec3 b);
 	glm::vec3 multiplyVector(glm::vec3 a, double b);
-
 	glm::vec3 crossProduct(glm::vec3 a, glm::vec3 b);
 
 	double getRayPlaneIntersection(Ray ray, Plane plane);
 	double getRaySphereIntersection(Ray ray, Sphere sphere);
 	double getRayTriangleIntersection(Ray ray, Triangle triangle);
-	glm::vec3 normalize(Ray ray);
 
 private:
 	GLFWwindow* window;

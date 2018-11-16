@@ -9,6 +9,14 @@ bool sphereIntersectionFound;
 bool planeIntersectionFound;
 bool triangeIntersectionFound;
 
+std::vector<Triangle> scene1_triangles;
+std::vector<Sphere> scene1_spheres;
+std::vector<Plane> scene1_planes;
+
+std::vector<Triangle> scene2_triangles;
+std::vector<Sphere> scene2_spheres;
+std::vector<Plane> scene2_planes;
+
 Program::Program() 
 {
 	setupWindow();
@@ -18,8 +26,14 @@ Program::~Program() {}
 
 void Program::start() 
 {
-	scene1();
-	//scene2();
+	//initialize scene objects
+	init_scene1();
+	init_scene2();
+	init_scene3();
+
+	//ray trace the scene
+	displayScene(2);
+
 }
 
 void Program::QueryGLVersion() 
@@ -28,21 +42,22 @@ void Program::QueryGLVersion()
 	std::string version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
 	std::string glslver = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 	std::string renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
-
-	std::cout << "OpenGL [ " << version << " ] "
-		<< "with GLSL [ " << glslver << " ] "
-		<< "on renderer [ " << renderer << " ]" << std::endl;
+	std::cout << "OpenGL [ " << version << " ] " << "with GLSL [ " << glslver << " ] " << "on renderer [ " << renderer << " ]" << std::endl;
 }
 
-void Program::scene1()
+void Program::init_scene1()
 {
 	//scene1 objects
 
+	//RGB color values
 	glm::vec3 grey = glm::vec3(0.8784, 0.8784, 0.8784);
 	glm::vec3 lightGrey = glm::vec3(0.6274, 0.6274, 0.6274);
 	glm::vec3 cyan = glm::vec3(0.0, 0.6, 0.6);
 	glm::vec3 green = glm::vec3(0, 1, 0);
 	glm::vec3 red = glm::vec3(1, 0, 0);
+
+	//light
+	Light light = Light(glm::vec3(0, 2.5, -7.75));
 
 	//reflective grey sphere
 	Sphere sphere = Sphere(glm::vec3(0.9, -1.925, -6.69), 0.825);
@@ -86,66 +101,9 @@ void Program::scene1()
 	Plane wall = Plane(glm::vec3(0, 0, 1), glm::vec3(0, 0, -10.5));
 	wall.color = grey;
 
-	Triangle triangle_array[12] = { red1, red2, green1, green2, floor1, floor2, ceiling1, ceiling2, pyramid1, pyramid2, pyramid3, pyramid4 };
-
-	//--------
-
-	int l = -256;
-	int r = 256;
-	int t = 256;
-	int b = -256;
-	int nx = 1024;
-	int ny = 1024;
-
-	image.Initialize();
-	//ran per pixel
-	for (int i = 0; i < image.Width(); i++)
-	{
-		for (int j = 0; j < image.Height(); j++)
-		{
-			/* from the textbook: ray equation
-			ray.direction <- -d w + U u + V v
-			ray.origin <- e
-			*/
-
-			//setting up the camera
-			double u = l + (r - l)*(i + 0.5) / nx;
-			double v = b + (t - b)*(j + 0.5) / ny;
-			double d = 443.40500673; //calculated distance based on 60 degrees field of view
-			
-			Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(u, v, -d)); //shoot a ray
-			glm::normalize(ray.direction); //normalize
-
-			//intersect ray and plane
-			double planeTime = getRayPlaneIntersection(ray, wall); 
-			if (planeIntersectionFound)
-			{
-				image.SetPixel(i, j, wall.color);
-			}
-			//intersect ray and triangle
-			for (Triangle t : triangle_array)
-			{
-				double triangleTime = getRayTriangleIntersection(ray, t); 
-				if (triangeIntersectionFound)
-				{
-					image.SetPixel(i, j, t.color);
-				}
-			}
-			//intersect ray and sphere
-			double sphereTime = getRaySphereIntersection(ray, sphere); 
-			if (sphereIntersectionFound)
-			{
-				image.SetPixel(i, j, sphere.color);
-			}
-		}
-	}
-	//Main render loop
-	while (!glfwWindowShouldClose(window))
-	{
-		image.Render();
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
+	scene1_triangles = { red1, red2, green1, green2, floor1, floor2, ceiling1, ceiling2, pyramid1, pyramid2, pyramid3, pyramid4 };
+	scene1_spheres = { sphere };
+	scene1_planes = { wall };
 }
 
 void Program::setupWindow() {
@@ -188,10 +146,11 @@ void Program::setupWindow() {
 	QueryGLVersion();
 }
 
-void Program::scene2()
+void Program::init_scene2()
 {
 	//set up scene2 objects
 
+	//RGB color values
 	glm::vec3 green = { 0,1,0 };
 	glm::vec3 lightGrey = { 0.6274,0.6274,0.6274 };
 	glm::vec3 red = { 1,0,0 };
@@ -291,16 +250,40 @@ void Program::scene2()
 	isoahedrgon19.color = red;
 	isoahedrgon20.color = red;
 	
-	Triangle triangle_array[32] = { isoahedrgon1, isoahedrgon2 , isoahedrgon3 , isoahedrgon4 , isoahedrgon5,
-								   isoahedrgon6, isoahedrgon7 , isoahedrgon8 , isoahedrgon9 , isoahedrgon10,
-								   isoahedrgon11, isoahedrgon12 , isoahedrgon13 , isoahedrgon14 , isoahedrgon15,
-								   isoahedrgon16, isoahedrgon17 , isoahedrgon18 , isoahedrgon19 , isoahedrgon20,
-								   cone1, cone2, cone3, cone4, cone5, cone6, cone7, cone8, cone9, cone10, cone11,
-								   cone12};
-	Sphere sphere_array[3] = { purpleSphere, greySphere, yellowSphere };
-	Plane plane_array[2] = { wall, floor };
+	scene2_triangles = {isoahedrgon1, isoahedrgon2 , isoahedrgon3 , isoahedrgon4 , isoahedrgon5,
+						isoahedrgon6, isoahedrgon7 , isoahedrgon8 , isoahedrgon9 , isoahedrgon10,
+						isoahedrgon11, isoahedrgon12 , isoahedrgon13 , isoahedrgon14 , isoahedrgon15,
+						isoahedrgon16, isoahedrgon17 , isoahedrgon18 , isoahedrgon19 , isoahedrgon20,
+						cone1, cone2, cone3, cone4, cone5, cone6, cone7, cone8, cone9, cone10, cone11,
+						cone12 };
+	scene2_spheres = { purpleSphere, greySphere, yellowSphere };
+	scene2_planes = { wall, floor };
+}
 
-	//--------
+void Program::init_scene3()
+{
+	//work in progress
+	//part V scene goes here
+}
+
+void Program::displayScene(int scene_number)
+{
+	std::vector<Triangle> triangle_array;
+	std::vector<Sphere> sphere_array;
+	std::vector<Plane> plane_array;
+
+	if (scene_number == 1)
+	{
+		triangle_array = scene1_triangles;
+		sphere_array = scene1_spheres;
+		plane_array = scene1_planes;
+	}
+	else if (scene_number == 2)
+	{
+		triangle_array = scene2_triangles;
+		sphere_array = scene2_spheres;
+		plane_array = scene2_planes;
+	}
 
 	int l = -256;
 	int r = 256;
@@ -346,7 +329,7 @@ void Program::scene2()
 					image.SetPixel(i, j, t.color);
 				}
 			}
-			
+
 			for (Sphere s : sphere_array)
 			{
 				double sphereTime = getRaySphereIntersection(ray, s); //for sphere
@@ -355,7 +338,6 @@ void Program::scene2()
 					image.SetPixel(i, j, s.color);
 				}
 			}
-			
 		}
 	}
 	//Main render loop
@@ -531,18 +513,6 @@ double Program::getRayTriangleIntersection(Ray ray, Triangle triangle)
 	}
 }
 
-glm::vec3 Program::normalize(Ray ray)
-{
-	double length = getMagnitude(ray.direction);
-	double x = ray.direction[0] / length;
-	double y = ray.direction[1] / length;
-	double z = ray.direction[2] / length;
-
-	glm::vec3 normal = {x,y,z};
-
-	return normal;
-}
-
 void ErrorCallback(int error, const char* description) 
 {
 	std::cout << "GLFW ERROR " << error << ":" << std::endl;
@@ -559,8 +529,3 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 }
 
 /*------------------------------------------------------------------*/
-
-
-
-
-
