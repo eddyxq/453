@@ -39,13 +39,15 @@ public:
 	glm::vec3 multiplyVector(glm::vec3 a, double b);
 	glm::vec3 crossProduct(glm::vec3 a, glm::vec3 b);
 
-	double getRayPlaneIntersection(Ray ray, Plane plane);
-	double getRaySphereIntersection(Ray ray, Sphere sphere);
-	double getRayTriangleIntersection(Ray ray, Triangle triangle);
+	double getRayPlaneIntersection(Ray ray, Shape plane);
+	double getRaySphereIntersection(Ray ray, Shape sphere);
+	double getRayTriangleIntersection(Ray ray, Shape triangle);
+	double getRayShapeIntersection(Ray ray, Shape shape);
 
-	glm::vec3 applySphereShading(Ray ray, Sphere sphere, Light light);
-	glm::vec3 applyPlaneShading(Ray ray, Plane plane, Light light);
-	glm::vec3 applyTriangleShading(Ray ray, Triangle triangle, Light light);
+	glm::vec3 applySphereShading(Ray ray, Shape sphere, Light light);
+	glm::vec3 applyPlaneShading(Ray ray, Shape plane, Light light);
+	glm::vec3 applyTriangleShading(Ray ray, Shape triangle, Light light);
+	glm::vec3 applyShapeShading(Ray ray, Shape shape, Light light);
 
 private:
 	GLFWwindow* window;
