@@ -44,10 +44,7 @@ public:
 	double getRayTriangleIntersection(Ray ray, Shape triangle);
 	double getRayShapeIntersection(Ray ray, Shape shape);
 
-	glm::vec3 applySphereShading(Ray ray, Shape sphere, Light light);
-	glm::vec3 applyPlaneShading(Ray ray, Shape plane, Light light);
-	glm::vec3 applyTriangleShading(Ray ray, Shape triangle, Light light);
-	glm::vec3 applyShapeShading(Ray ray, Shape shape, Light light);
+	glm::vec3 applyColor(Ray ray, Shape shape, Light light);
 
 private:
 	GLFWwindow* window;

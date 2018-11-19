@@ -10,9 +10,7 @@ bool intersectionFound;
 std::vector<Shape> scene1_shapes;
 std::vector<Shape> scene2_shapes;
 
-glm::vec3 sphereIntersection;
-glm::vec3 planeIntersection;
-glm::vec3 triangleIntersection;
+glm::vec3 intersectionPoint;
 
 Program::Program() 
 {
@@ -98,6 +96,7 @@ void Program::init_scene1()
 	Shape wall = Plane(glm::vec3(0, 0, 1), glm::vec3(0, 0, -10.5));
 	wall.color = grey;
 	scene1_shapes = { wall, red1, red2, green1, green2, floor1, floor2, ceiling1, ceiling2, pyramid1, pyramid4, pyramid3, pyramid2, sphere };
+	//scene1_shapes = { sphere};
 }
 
 void Program::setupWindow() {
@@ -250,6 +249,8 @@ void Program::init_scene2()
 						isoahedrgon16, isoahedrgon17 , isoahedrgon18 , isoahedrgon19 , isoahedrgon20,
 						cone1, cone2, cone3, cone4, cone5, cone6, cone7, cone8, cone9, cone10, cone11,
 						cone12, purpleSphere, greySphere, yellowSphere };
+						
+	//scene2_shapes = { purpleSphere, greySphere, yellowSphere };
 }
 
 void Program::init_scene3()
@@ -261,9 +262,6 @@ void Program::init_scene3()
 void Program::displayScene(int scene_number)
 {
 	Light light = Light(glm::vec3(0,0,0));
-	std::vector<Shape> triangle_array;
-	std::vector<Shape> sphere_array;
-	std::vector<Shape> plane_array;
 	std::vector<Shape> shape_array;
 
 	//std::vector<Shape> plane_array;
@@ -271,13 +269,13 @@ void Program::displayScene(int scene_number)
 	if (scene_number == 1)
 	{
 		shape_array = scene1_shapes;
-		light = Light(glm::vec3(0, 2.5, -7.75));
+		light = Light(glm::vec3(0.0, 2.5, -7.75));
 
 	}
 	else if (scene_number == 2)
 	{
 		shape_array = scene2_shapes;
-		light = Light(glm::vec3(4, 6, -1));
+		light = Light(glm::vec3(4.0, 6.0, -1.0));
 	}
 
 	int l = -256;
@@ -286,13 +284,19 @@ void Program::displayScene(int scene_number)
 	int b = -256;
 	int nx = 1024;
 	int ny = 1024;
+
 	
+
 	image.Initialize();
 	//ran per pixel
 	for (int i = 0; i < image.Width(); i++)
 	{
 		for (int j = 0; j < image.Height(); j++)
 		{
+			double lowestTime = 99999;
+			Shape nearestObject;
+
+
 			/* from the textbook: ray equation
 			ray.direction <- -d w + U u + V v
 			ray.origin <- e
@@ -305,15 +309,41 @@ void Program::displayScene(int scene_number)
 
 			Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(u, v, -d)); //shoot a ray
 			glm::normalize(ray.direction); //normalize
+
 			for (Shape s : shape_array)
 			{
 				intersectionFound = false;
-				
-				double sphereTime = getRayShapeIntersection(ray, s); //for sphere
+				double time = getRayShapeIntersection(ray, s); 
+				if (time < lowestTime)
+				{
+					lowestTime = time;
+					nearestObject = s;
+				}
+
 				if (intersectionFound)
 				{
-					glm::vec3 color = applyShapeShading(ray, s, light);
+					glm::vec3 color = applyColor(ray, nearestObject, light);
 					image.SetPixel(i, j, color);
+					
+					glm::vec3 intersectionP = multiplyVector(ray.direction, time);
+					glm::vec3 sDir = (light.position - intersectionP);
+					glm::normalize(sDir);
+					Ray sRay = Ray(intersectionP, sDir); 
+
+					intersectionFound = false;
+
+					for (Shape s : shape_array)
+					{
+						double ntime = getRayShapeIntersection(sRay, s);
+						if ((ntime > 0) && (ntime < 1) && intersectionFound)
+						{
+							s.color *= 0;
+
+							image.SetPixel(i, j, s.color);
+						}
+						intersectionFound = false;
+					}
+					
 				}
 			}
 		}
@@ -361,6 +391,7 @@ double Program::getRayPlaneIntersection(Ray ray, Shape plane)
 	ray-plane intersectionformula: (o + t(d) - p) . n = 0
 	re-arrange for t, we get: t = (p - o) . n / (d . n)
 	*/
+	double t = 99999;
 
 	double numerator = dotProduct(subtractVector(plane.point, ray.origin), plane.normal); // (point - origin) . n
 	double denominator = dotProduct(ray.direction, plane.normal); // d . n
@@ -369,21 +400,22 @@ double Program::getRayPlaneIntersection(Ray ray, Shape plane)
 	{
 		//set intersection flags, returns -1 if no intersection
 		intersectionFound = false;
-		planeIntersection = glm::vec3{ 0,0,0 };
-		return -1;
+		//planeIntersection = glm::vec3{ 0,0,0 };
+		return t;
 	}
 	// ((point - origin) . n) / (d . n)
-	double t = numerator / denominator;
+	t = numerator / denominator;
 	// check for positive t intersections, sets flags appropriately
 	if (t >= 0)
 	{
 		intersectionFound = true;
-		planeIntersection = multiplyVector(ray.direction, t);
+		intersectionPoint = multiplyVector(ray.direction, t);
 	}
 	else
 	{
 		intersectionFound = false;
-		planeIntersection = glm::vec3{ 0,0,0 };
+		//planeIntersection = glm::vec3{ 0,0,0 };
+		t = 99999;
 	}
 	return t;
 }
@@ -393,6 +425,7 @@ double Program::getRaySphereIntersection(Ray ray, Shape sphere)
 	/* 
 	ray-sphere intersection formula: (o + t(d) - c) . (o + t(d) - c) - r^2 = 0
 	*/
+	double t = 99999;
 
 	double a, b, c;
 	//calculate coefficients
@@ -408,26 +441,25 @@ double Program::getRaySphereIntersection(Ray ray, Shape sphere)
 		double t1 = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
 		double t2 = (-b - sqrt((b*b) - 4 * a*c)) / (2 * a);
 		double closerIntersectionPoint = glm::min(t1, t2);
-		glm::vec3 intersection = multiplyVector(ray.direction, closerIntersectionPoint);
-		sphereIntersection = intersection;
-		return closerIntersectionPoint;
+		intersectionPoint = multiplyVector(ray.direction, closerIntersectionPoint);
+		t = closerIntersectionPoint;
 	}
 	//when 0 there is 1 intersection
 	else if (discriminant == 0)
 	{
 		intersectionFound = true;
 		double closerIntersectionPoint = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
-		glm::vec3 intersection = multiplyVector(ray.direction, closerIntersectionPoint);
-		sphereIntersection = intersection;
-		return closerIntersectionPoint;
+		intersectionPoint = multiplyVector(ray.direction, closerIntersectionPoint);
+		t = closerIntersectionPoint;
 	}
 	//when negative there is no intersection
 	else
 	{
 		intersectionFound = false;
-		sphereIntersection = glm::vec3{ 0,0,0 };
-		return -1;
+		intersectionPoint = glm::vec3{ 0,0,0 };
+		t = 99999;
 	}
+	return t;
 }
 
 double Program::getRayTriangleIntersection(Ray ray, Shape triangle)
@@ -449,8 +481,8 @@ double Program::getRayTriangleIntersection(Ray ray, Shape triangle)
 	if (denominator == 0)
 	{
 		intersectionFound = false;
-		planeIntersection = glm::vec3{ 0,0,0 };
-		return -1;
+		//planeIntersection = glm::vec3{ 0,0,0 };
+		return 99999;
 	}
 
 	double t = numerator / denominator;
@@ -476,27 +508,27 @@ double Program::getRayTriangleIntersection(Ray ray, Shape triangle)
 			(std::abs((w * triangle.p0.z + u * triangle.p1.z + v * triangle.p2.z) - pT.z) < 0.00001))
 		{
 			intersectionFound = true;
-			triangleIntersection = pT;
+			intersectionPoint = pT;
 			return t;
 		}
 		else 
 		{ 
 			intersectionFound = false;
-			triangleIntersection = glm::vec3{ 0,0,0 };
-			return -1;
+			intersectionPoint = glm::vec3{ 0,0,0 };
+			return 99999;
 		}
 	}
 	else 
 	{
 		intersectionFound = false;
-		triangleIntersection = glm::vec3{ 0,0,0 };
-		return -1;
+		intersectionPoint = glm::vec3{ 0,0,0 };
+		return 99999;
 	}
 }
 
 double Program::getRayShapeIntersection(Ray ray, Shape shape)
 {
-	double time = -1;
+	double time = 99999;
 	if (shape.shapeID == 1)
 	{
 		time = getRaySphereIntersection(ray, shape);
@@ -512,250 +544,80 @@ double Program::getRayShapeIntersection(Ray ray, Shape shape)
 	return time;
 }
 
-glm::vec3 Program::applySphereShading(Ray ray, Shape sphere, Light light)
+glm::vec3 Program::applyColor(Ray ray, Shape shape, Light light)
 {
-	//light calculations
-
-	/*--------------------------------------------------------------------------------------------------------------
-	From textbook
-
-	Typical values of p:
-	10��eggshell�;
-	100�mildly shiny;
-	1000�really glossy;
-	10,000�nearlymirror-like.
-
-	L = kd I max(0, n � l) + ks I max(0, n � h)p
-
-	*/
-	//--------------------------------------------------------------------------------------------------------------
-	
 	//I = intensity/color of the light source
 	glm::vec3 I = { 1,1,1 };
 
 	//kd = diffuse coefficient (surface color)
-	glm::vec3 kd = sphere.color;
+	glm::vec3 kd = shape.color;
 
 	//Ia = ambient light color
 	glm::vec3 Ia = I;
 
 	//ka = ambient coefficient (default color)
 	glm::vec3 ka = kd;
-	
+
 	//ka * Ia
 	glm::vec3 ambient_component = ka * Ia;
 
 	//l - light source position - intersection point
-	glm::vec3 l = sphereIntersection - light.position;
+	glm::vec3 l = intersectionPoint - light.position;
 	glm::normalize(l);
 
-	//calculation for the normal might be wrong
-	glm::vec3 normal = -(sphereIntersection - sphere.center);
-	glm::normalize(normal);
-
-	//get max of 0 and n . l
-	float max_diffuse = (dotProduct(normal, l) > 0) ? dotProduct(normal, l) : 0;
-	
-	//kd * I * max(0, normal . l))
-	glm::vec3 diffuse_component = max_diffuse * I * kd;
-
-	//choosing a specular color
-	float ks = 1.0f;
-
-	//choosing a exponent
-	double p = 8; //p = Phong exponent
-
-	//calculations for v and h
-	glm::vec3 v = sphereIntersection - ray.origin;
-	glm::normalize(v);
-
-	//h = (v+l) / (||v+l||)
-	glm::vec3 h = (v + l) / glm::length(v + l);
-
-	//max of 0 and (normal . h)^p
-	float max_specular = pow(dotProduct(normal, h), p) > 0 ? pow(dotProduct(normal, h), p) : 0;
-
-	//ks * I * max(0, (normal . h)^p)
-	glm::vec3 specular_component = max_specular * ks * I;
-
-	//putting the whole thing together, diffuse + specular
-	//L = ka * Ia + kd * I * max(0, dot(normal, l)) + ks * I * max(0, pow(dot(normal, h), p));
-	glm::vec3 L = ambient_component + diffuse_component + specular_component;
-	
-	return L;
-}
-
-glm::vec3 Program::applyPlaneShading(Ray ray, Shape plane, Light light)
-{
-	//light calculations
-
-	/*--------------------------------------------------------------------------------------------------------------
-	From textbook
-
-	Typical values of p:
-	10��eggshell�;
-	100�mildly shiny;
-	1000�really glossy;
-	10,000�nearlymirror-like.
-
-	L = kd I max(0, n � l) + ks I max(0, n � h)p
-
-	*/
-	//--------------------------------------------------------------------------------------------------------------
-
-	
-	//I = intensity/color of the light source
-	glm::vec3 I = { 1,1,1 };
-
-	//kd = diffuse coefficient (surface color)
-	glm::vec3 kd = plane.color;
-
-	//Ia = ambient light color
-	glm::vec3 Ia = I;
-
-	//ka = ambient coefficient (default color)
-	glm::vec3 ka = kd;
-	
-	//ka * Ia
-	glm::vec3 ambient_component = ka * Ia;
-
-	//l - light source position - intersection point
-	glm::vec3 l = planeIntersection - light.position;
-	glm::normalize(l);
-
-	//calculation for the normal might be wrong
-	glm::vec3 normal = plane.normal;
-	glm::normalize(normal);
-
-	//get max of 0 and n . l
-	float max_diffuse = (dotProduct(normal, l) > 0) ? dotProduct(normal, l) : 0;
-	
-	//kd * I * max(0, normal . l))
-	glm::vec3 diffuse_component = max_diffuse * I * kd;
-
-	//choosing a specular color
-	float ks = 1.0f;
-
-	//choosing a exponent
-	double p = 8; //p = Phong exponent
-
-	//calculations for v and h
-	glm::vec3 v = planeIntersection - ray.origin;
-	glm::normalize(v);
-
-	//h = (v+l) / (||v+l||)
-	glm::vec3 h = (v + l) / glm::length(v + l);
-
-	//max of 0 and (normal . h)^p
-	float max_specular = pow(dotProduct(normal, h), p) > 0 ? pow(dotProduct(normal, h), p) : 0;
-
-	//ks * I * max(0, (normal . h)^p)
-	glm::vec3 specular_component = max_specular * ks * I;
-
-	//putting the whole thing together, diffuse + specular
-	//L = ka * Ia + kd * I * max(0, dot(normal, l)) + ks * I * max(0, pow(dot(normal, h), p));
-	glm::vec3 L = ambient_component + diffuse_component + specular_component;
-	
-	return L;
-}
-
-glm::vec3 Program::applyTriangleShading(Ray ray, Shape triangle, Light light)
-{
-	//light calculations
-
-	/*--------------------------------------------------------------------------------------------------------------
-	From textbook
-
-	Typical values of p:
-	10��eggshell�;
-	100�mildly shiny;
-	1000�really glossy;
-	10,000�nearlymirror-like.
-
-	L = kd I max(0, n � l) + ks I max(0, n � h)p
-
-	*/
-	//--------------------------------------------------------------------------------------------------------------
-
-	
-	//I = intensity/color of the light source
-	glm::vec3 I = { 1,1,1 };
-
-	//kd = diffuse coefficient (surface color)
-	glm::vec3 kd = triangle.color;
-
-	//Ia = ambient light color
-	glm::vec3 Ia = I;
-
-	//ka = ambient coefficient (default color)
-	glm::vec3 ka = kd;
-	
-	//ka * Ia
-	glm::vec3 ambient_component = ka * Ia;
-
-	//l - light source position - intersection point
-	glm::vec3 l = triangleIntersection - light.position;
-	glm::normalize(l);
-
-	//calculation for the normal might be wrong
-	glm::vec3 x = subtractVector(triangle.p1, triangle.p0); //p1 - p0
-	glm::vec3 y = subtractVector(triangle.p2, triangle.p0); //p2 - p0
-
-	glm::vec3 planeNormal = crossProduct(x, y); //cross product
-
-	double n = getMagnitude(planeNormal);// ||N||
-
-	glm::vec3 normal = { planeNormal[0] / n, planeNormal[1] / n, planeNormal[2] / n }; // n = N / ||N||
-
-	//get max of 0 and n . l
-	float max_diffuse = (dotProduct(normal, l) > 0) ? dotProduct(normal, l) : 0;
-	
-	//kd * I * max(0, normal . l))
-	glm::vec3 diffuse_component = max_diffuse * I * kd;
-
-	//choosing a specular color
-	float ks = 1.0f;
-
-	//choosing a exponent
-	double p = 8; //p = Phong exponent
-
-	//calculations for v and h
-	glm::vec3 v = triangleIntersection - ray.origin;
-	glm::normalize(v);
-
-	//h = (v+l) / (||v+l||)
-	glm::vec3 h = (v + l) / glm::length(v + l);
-
-	//max of 0 and (normal . h)^p
-	float max_specular = pow(dotProduct(normal, h), p) > 0 ? pow(dotProduct(normal, h), p) : 0;
-
-	//ks * I * max(0, (normal . h)^p)
-	glm::vec3 specular_component = max_specular * ks * I;
-
-	//putting the whole thing together, diffuse + specular
-	//L = ka * Ia + kd * I * max(0, dot(normal, l)) + ks * I * max(0, pow(dot(normal, h), p));
-	glm::vec3 L = ambient_component + diffuse_component + specular_component;
-	
-	return L;
-}
-
-glm::vec3 Program::applyShapeShading(Ray ray, Shape shape, Light light)
-{
-	glm::vec3 color;
-
+	//calculation for the normal
+	glm::vec3 normal;
 	if (shape.shapeID == 1)
 	{
-		color = applySphereShading(ray, shape, light);
+		normal = -(intersectionPoint - shape.center);
 	}
 	else if (shape.shapeID == 2)
 	{
-		color = applyPlaneShading(ray, shape, light);
+		normal = shape.normal;
 	}
 	else if (shape.shapeID == 3)
 	{
-		color = applyTriangleShading(ray, shape, light);
+		glm::vec3 x = subtractVector(shape.p1, shape.p0); //p1 - p0
+		glm::vec3 y = subtractVector(shape.p2, shape.p0); //p2 - p0
+
+		glm::vec3 planeNormal = crossProduct(x, y); //cross product
+
+		double n = getMagnitude(planeNormal);// ||N||
+
+		normal = { planeNormal[0] / n, planeNormal[1] / n, planeNormal[2] / n }; // n = N / ||N||
 	}
-	return color;
+	glm::normalize(normal);
+
+	//get max of 0 and n . l
+	float max_diffuse = (dotProduct(normal, l) > 0) ? dotProduct(normal, l) : 0;
+
+	//kd * I * max(0, normal . l))
+	glm::vec3 diffuse_component = max_diffuse * I * kd;
+
+	//choosing a specular color
+	float ks = 1.0f;
+
+	//choosing a exponent
+	double p = 8; //p = Phong exponent
+
+	//calculations for v and h
+	glm::vec3 v = intersectionPoint - ray.origin;
+	glm::normalize(v);
+
+	//h = (v+l) / (||v+l||)
+	glm::vec3 h = (v + l) / glm::length(v + l);
+
+	//max of 0 and (normal . h)^p
+	float max_specular = pow(dotProduct(normal, h), p) > 0 ? pow(dotProduct(normal, h), p) : 0;
+
+	//ks * I * max(0, (normal . h)^p)
+	glm::vec3 specular_component = max_specular * ks * I;
+
+	//putting the whole thing together, diffuse + specular
+	//L = ka * Ia + kd * I * max(0, dot(normal, l)) + ks * I * max(0, pow(dot(normal, h), p));
+	glm::vec3 L = ambient_component + diffuse_component + specular_component;
+
+	return L;
 }
 
 void ErrorCallback(int error, const char* description) 
