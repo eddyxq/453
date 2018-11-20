@@ -27,8 +27,8 @@ void Program::start()
 	init_scene3();
 
 	//ray trace the scene
-	displayScene(1);
-	//displayScene(2);
+	//displayScene(1);
+	displayScene(2);
 }
 
 void Program::QueryGLVersion() 
@@ -96,7 +96,6 @@ void Program::init_scene1()
 	Shape wall = Plane(glm::vec3(0, 0, 1), glm::vec3(0, 0, -10.5));
 	wall.color = grey;
 	scene1_shapes = { wall, red1, red2, green1, green2, floor1, floor2, ceiling1, ceiling2, pyramid1, pyramid4, pyramid3, pyramid2, sphere };
-	//scene1_shapes = { sphere};
 }
 
 void Program::setupWindow() {
@@ -249,8 +248,6 @@ void Program::init_scene2()
 						isoahedrgon16, isoahedrgon17 , isoahedrgon18 , isoahedrgon19 , isoahedrgon20,
 						cone1, cone2, cone3, cone4, cone5, cone6, cone7, cone8, cone9, cone10, cone11,
 						cone12, purpleSphere, greySphere, yellowSphere };
-						
-	//scene2_shapes = { purpleSphere, greySphere, yellowSphere };
 }
 
 void Program::init_scene3()
@@ -335,15 +332,13 @@ void Program::displayScene(int scene_number)
 					for (Shape s : shape_array)
 					{
 						double ntime = getRayShapeIntersection(sRay, s);
-						if ((ntime > 0) && (ntime < 1) && intersectionFound)
+						if ((ntime > 0.0001) && intersectionFound && (ntime < 0.9999))
 						{
-							s.color *= 0;
-
-							image.SetPixel(i, j, s.color);
+							glm::vec3 black = { 0.0, 0.0, 0.0 };
+							image.SetPixel(i, j, black);
 						}
 						intersectionFound = false;
 					}
-					
 				}
 			}
 		}
@@ -589,7 +584,7 @@ glm::vec3 Program::applyColor(Ray ray, Shape shape, Light light)
 	glm::normalize(normal);
 
 	//get max of 0 and n . l
-	float max_diffuse = (dotProduct(normal, l) > 0) ? dotProduct(normal, l) : 0;
+	float max_diffuse = (dotProduct(normal, l) > 0.0001) ? dotProduct(normal, l) : 0;
 
 	//kd * I * max(0, normal . l))
 	glm::vec3 diffuse_component = max_diffuse * I * kd;
@@ -608,7 +603,7 @@ glm::vec3 Program::applyColor(Ray ray, Shape shape, Light light)
 	glm::vec3 h = (v + l) / glm::length(v + l);
 
 	//max of 0 and (normal . h)^p
-	float max_specular = pow(dotProduct(normal, h), p) > 0 ? pow(dotProduct(normal, h), p) : 0;
+	float max_specular = pow(dotProduct(normal, h), p) > 0.0001 ? pow(dotProduct(normal, h), p) : 0;
 
 	//ks * I * max(0, (normal . h)^p)
 	glm::vec3 specular_component = max_specular * ks * I;
