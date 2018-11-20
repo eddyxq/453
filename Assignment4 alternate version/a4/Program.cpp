@@ -395,7 +395,7 @@ void Program::displayScene(int scene_number)
 				std::cout << "ERROR NOT POSSIBLE TO GET HERE" << std::endl;
 			}
 
-			glm::vec3 intersection = ray.direction * nearestObjectTime;
+			glm::vec3 intersection = ray.origin + (ray.direction * nearestObjectTime);
 			glm::vec3 shadowRayDirection = (light.position - intersection);
 			shadowRayDirection = glm::normalize(shadowRayDirection);
 			Ray shadowRay = Ray(intersection, shadowRayDirection);
@@ -422,7 +422,6 @@ void Program::displayScene(int scene_number)
 				if ((triangeIntersectionFound) && (triangleTime > 0.001) && (triangleTime <= 1.0))
 				{
 					inShadow = true;
-
 				}
 			}
 			//intersect ray and spheres
@@ -432,7 +431,6 @@ void Program::displayScene(int scene_number)
 				if ((sphereIntersectionFound) && (sphereTime > 0.001) && (sphereTime <= 1.0))
 				{
 					inShadow = true;
-
 				}
 			}
 			if (inShadow)
@@ -479,7 +477,7 @@ float Program::getRayPlaneIntersection(Ray ray, Shape plane)
 	if (t >= 0)
 	{
 		planeIntersectionFound = true;
-		planeIntersection = ray.direction * t;
+		planeIntersection = ray.origin + (ray.direction * t);
 	}
 	else
 	{
@@ -509,7 +507,7 @@ float Program::getRaySphereIntersection(Ray ray, Shape sphere)
 		float t1 = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
 		float t2 = (-b - sqrt((b*b) - 4 * a*c)) / (2 * a);
 		float closerIntersectionPoint = glm::min(t1, t2);
-		glm::vec3 intersection = ray.direction * closerIntersectionPoint;
+		glm::vec3 intersection = ray.origin + ray.direction * closerIntersectionPoint;
 		sphereIntersection = intersection;
 		return closerIntersectionPoint;
 	}
@@ -518,7 +516,7 @@ float Program::getRaySphereIntersection(Ray ray, Shape sphere)
 	{
 		sphereIntersectionFound = true;
 		float closerIntersectionPoint = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
-		glm::vec3 intersection = ray.direction * closerIntersectionPoint;
+		glm::vec3 intersection = ray.origin + ray.direction * closerIntersectionPoint;
 		sphereIntersection = intersection;
 		return closerIntersectionPoint;
 	}
@@ -546,7 +544,7 @@ float Program::getRayTriangleIntersection(Ray ray, Shape triangle)
 
 	float planeTime = getRayPlaneIntersection(ray, tPlane);
 
-	glm::vec3 intersectionP = ray.direction * planeTime;
+	glm::vec3 intersectionP = ray.origin + (ray.direction * planeTime);
 
 	float numerator = glm::dot(tPlane.point - ray.origin, tPlane.normal);
 	float denominator = glm::dot(ray.direction, tPlane.normal);
@@ -561,13 +559,31 @@ float Program::getRayTriangleIntersection(Ray ray, Shape triangle)
 
 	float t = numerator / denominator;
 
-	glm::vec3 pT = intersectionP;
+	glm::vec3 m = glm::cross(triangle.p1 - triangle.p0, triangle.p2 - triangle.p0);
+	m = glm::normalize(m);
 
-	float area = n / 2.0;
+	glm::vec3 a1 = glm::cross(triangle.p2 - intersectionP, triangle.p0 - intersectionP);
+	glm::vec3 a2 = glm::cross(triangle.p0 - intersectionP, triangle.p1 - intersectionP);
+	glm::vec3 a0 = glm::cross(triangle.p1 - intersectionP, triangle.p2 - intersectionP);
 
-	glm::vec3 a1 = glm::cross(pT - triangle.p0, triangle.p2 - triangle.p0);
-	glm::vec3 a2 = glm::cross(pT - triangle.p0, triangle.p1 - triangle.p0);
+	float d0 = glm::dot(m, a0);
+	float d1 = glm::dot(m, a1);
+	float d2 = glm::dot(m, a2);
 
+	if ((d0 >= 0) && (d1 >= 0) && (d2 >= 0))
+	{
+		triangeIntersectionFound = true;
+		triangleIntersection = intersectionP;
+		return t;
+	}
+	else
+	{
+		triangeIntersectionFound = false;
+		triangleIntersection = glm::vec3{ 0,0,0 };
+		return INFINITY;
+	}
+
+	/*
 	float area1 = getMagnitude(a1) / 2.0;
 	float area2 = getMagnitude(a2) / 2.0;
 
@@ -598,6 +614,7 @@ float Program::getRayTriangleIntersection(Ray ray, Shape triangle)
 		triangleIntersection = glm::vec3{ 0,0,0 };
 		return INFINITY;
 	}
+	*/
 }
 
 glm::vec3 Program::applyColor(Ray ray, Shape shape, Light light)
