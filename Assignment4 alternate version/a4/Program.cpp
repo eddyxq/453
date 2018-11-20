@@ -617,6 +617,27 @@ float Program::getRayTriangleIntersection(Ray ray, Shape triangle)
 	*/
 }
 
+float Program::getRayShapeIntersection(Ray ray, Shape shape)
+{
+	if (shape.shapeID == 1) //sphere
+	{
+		return getRaySphereIntersection(ray, shape);
+	}
+	else if (shape.shapeID == 2) //plane
+	{
+		return getRayPlaneIntersection(ray, shape);
+	}
+	else if (shape.shapeID == 3) //triangle
+	{
+		return getRayTriangleIntersection(ray, shape);
+	}
+	else
+	{
+		return 999999.9999f;
+	}
+	
+}
+
 glm::vec3 Program::applyColor(Ray ray, Shape shape, Light light)
 {
 	glm::vec3 intersectionPoint;

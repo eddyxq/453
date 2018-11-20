@@ -39,6 +39,8 @@ public:
 	float getRaySphereIntersection(Ray ray, Shape sphere);
 	float getRayTriangleIntersection(Ray ray, Shape triangle);
 
+	float getRayShapeIntersection(Ray ray, Shape shape);
+
 	glm::vec3 applyColor(Ray ray, Shape shape, Light light);
 
 
