@@ -46,7 +46,9 @@ public:
 	double getRayTriangleIntersection(Ray ray, Shape triangle);
 	double getRayShapeIntersection(Ray ray, Shape shape);
 
-	glm::vec3 applyColor(Ray ray, Shape shape, Light light, double time);
+	glm::vec3 applyColor(Ray ray, Shape shape, Light light, double time, double depth, std::vector<Shape> shape_array);
+	glm::vec3 applyColor2(Ray ray, Shape shape, Light light, double time, double depth);
+
 	glm::vec3 applyShadow(Ray ray, Shape shape, Light light);
 private:
 	GLFWwindow* window;
