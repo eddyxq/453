@@ -33,6 +33,8 @@ public:
 
 	void displayScene(int scene_number);
 
+	glm::vec3 reflectRay(double depth, Ray rayIn, Light lightIn, std::vector<Shape> shape_arrayIn);
+
 	double getMagnitude(glm::vec3 a);
 	double dotProduct(glm::vec3 a, glm::vec3 b);
 	glm::vec3 subtractVector(glm::vec3 a, glm::vec3 b);
@@ -44,8 +46,8 @@ public:
 	double getRayTriangleIntersection(Ray ray, Shape triangle);
 	double getRayShapeIntersection(Ray ray, Shape shape);
 
-	glm::vec3 applyColor(Ray ray, Shape shape, Light light);
-
+	glm::vec3 applyColor(Ray ray, Shape shape, Light light, double time);
+	glm::vec3 applyShadow(Ray ray, Shape shape, Light light);
 private:
 	GLFWwindow* window;
         ImageBuffer image;

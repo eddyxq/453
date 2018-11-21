@@ -4,13 +4,12 @@
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+using namespace std;
 
 bool intersectionFound;
 
 std::vector<Shape> scene1_shapes;
 std::vector<Shape> scene2_shapes;
-
-glm::vec3 intersectionPoint;
 
 Program::Program() 
 {
@@ -27,8 +26,15 @@ void Program::start()
 	init_scene3();
 
 	//ray trace the scene
-	//displayScene(1);
-	displayScene(2);
+
+	Ray testRay = Ray(glm::vec3(0,0,0), glm::vec3(0, 1, -4));
+	Triangle testTriangle = Triangle(glm::vec3(2,-1,-3), glm::vec3(-1,3,-5), glm::vec3(-1,-1,-3));
+
+	double testTime = getRayTriangleIntersection(testRay, testTriangle);
+
+	//std::cout << testTime << std::endl;
+	displayScene(1);
+	//displayScene(2);
 }
 
 void Program::QueryGLVersion() 
@@ -57,6 +63,9 @@ void Program::init_scene1()
 	//reflective grey sphere
 	Shape sphere = Sphere(glm::vec3(0.9, -1.925, -6.69), 0.825);
 	sphere.color = lightGrey;
+	sphere.ks = glm::vec3(0.1f, 0.1f, 0.1f);
+	sphere.ka = glm::vec3(0.5, 0.5, 0.5);
+	sphere.p = 10000;
 
 	//blue pyramid
 	Shape pyramid1 = Triangle(glm::vec3(-0.4, -2.75, -9.55), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(0.11, -2.75, -7.98));
@@ -64,38 +73,79 @@ void Program::init_scene1()
 	Shape pyramid3 = Triangle(glm::vec3(-1.46, -2.75, -7.47), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(-1.97, -2.75, -9.04));
 	Shape pyramid4 = Triangle(glm::vec3(-1.97, -2.75, -9.04), glm::vec3(-0.93, 0.55, -8.51), glm::vec3(-0.4, -2.75, -9.55));
 	pyramid1.color = cyan;
+	pyramid1.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	pyramid1.ka = glm::vec3(0.0, 1.0, 1.0);
+	pyramid1.p = 100;
 	pyramid2.color = cyan;
+	pyramid2.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	pyramid2.ka = glm::vec3(0.0, 1.0, 1.0);
+	pyramid2.p = 100;
 	pyramid3.color = cyan;
+	pyramid3.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	pyramid3.ka = glm::vec3(0.0, 1.0, 1.0);
+	pyramid3.p = 100;
 	pyramid4.color = cyan;
+	pyramid4.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	pyramid4.ka = glm::vec3(0.0, 1.0, 1.0);
+	pyramid4.p = 100;
 
 	//ceiling
 	Shape ceiling1 = Triangle(glm::vec3(2.75, 2.75, -10.5), glm::vec3(2.75, 2.75, -5), glm::vec3(-2.75, 2.75, -5));
 	Shape ceiling2 = Triangle(glm::vec3(-2.75, 2.75, -10.5), glm::vec3(2.75, 2.75, -10.5), glm::vec3(-2.75, 2.75, -5));
 	ceiling1.color = grey;
+	ceiling1.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	ceiling1.ka = glm::vec3(0.5, 0.5, 0.5);
+	ceiling1.p = 10;
 	ceiling2.color = grey;
+	ceiling2.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	ceiling2.ka = glm::vec3(0.5, 0.5, 0.5);
+	ceiling2.p = 10;
 
 	//green wall
 	Shape green1 = Triangle(glm::vec3(2.75, 2.75, -5), glm::vec3(2.75, 2.75, -10.5), glm::vec3(2.75, -2.75, -10.5));
 	Shape green2 = Triangle(glm::vec3(2.75, -2.75, -5), glm::vec3(2.75, 2.75, -5), glm::vec3(2.75, -2.75, -10.5));
 	green1.color = green;
+	green1.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	green1.ka = glm::vec3(0.0, 1.0, 0.0);
+	green1.p = 10;
 	green2.color = green;
+	green2.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	green2.ka = glm::vec3(0.0, 1.0, 0.0);
+	green2.p = 10;
 
 	//red wall
 	Shape red1 = Triangle(glm::vec3(-2.75, -2.75, -5), glm::vec3(-2.75, -2.75, -10.5), glm::vec3(-2.75, 2.75, -10.5));
 	Shape red2 = Triangle(glm::vec3(-2.75, 2.75, -5), glm::vec3(-2.75, -2.75, -5), glm::vec3(-2.75, 2.75, -10.5));
 	red1.color = red;
+	red1.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	red1.ka = glm::vec3(1.0, 0.0, 0.0);
+	red1.p = 10;
 	red2.color = red;
+	red2.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	red2.ka = glm::vec3(1.0, 0.0, 0.0);
+	red2.p = 10;
 
 	//floor
 	Shape floor1 = Triangle(glm::vec3(2.75, -2.75, -5), glm::vec3(2.75, -2.75, -10.5), glm::vec3(-2.75, -2.75, -10.5));
 	Shape floor2 = Triangle(glm::vec3(-2.75, -2.75, -5), glm::vec3(2.75, -2.75, -5), glm::vec3(-2.75, -2.75, -10.5));
 	floor1.color = grey;
+	floor1.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	floor1.ka = glm::vec3(1.0, 1.0, 1.0);
+	floor1.p = 10;
 	floor2.color = grey;
+	floor2.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	floor2.ka = glm::vec3(1.0, 1.0, 1.0);
+	floor2.p = 10;
 
 	//back wall
 	Shape wall = Plane(glm::vec3(0, 0, 1), glm::vec3(0, 0, -10.5));
 	wall.color = grey;
+	wall.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	wall.ka = glm::vec3(1.0, 1.0, 1.0);
+	wall.p = 10;
+
 	scene1_shapes = { wall, red1, red2, green1, green2, floor1, floor2, ceiling1, ceiling2, pyramid1, pyramid4, pyramid3, pyramid2, sphere };
+	//scene1_shapes = {sphere};
 }
 
 void Program::setupWindow() {
@@ -157,22 +207,41 @@ void Program::init_scene2()
 	//floor
 	Shape floor = Plane(glm::vec3(0, 1, 0), glm::vec3(0, -1, 0));
 	floor.color = lightGrey;
+	floor.ks = glm::vec3(0.5f, 0.5f, 0.5f);
+	floor.ka = glm::vec3(0.62, 0.62, 0.62);
+	floor.p = 10;
+	floor.Ia = 0.8f;
 
 	//back wall
 	Shape wall = Plane(glm::vec3(0, 0, 1), glm::vec3(0, 0, -12));
 	wall.color = cyan;
+	wall.ks = glm::vec3(0.0f, 1.0f, 1.0f);
+	wall.ka = glm::vec3(0.0, 1.0, 1.0);
+	wall.p = 10;
+	wall.Ia = 1.0f;
 
 	//large yellow sphere
 	Shape yellowSphere = Sphere(glm::vec3(1, -0.5, -3.5), 0.5);
 	yellowSphere.color = yellow;
+	yellowSphere.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	yellowSphere.ka = glm::vec3(1.0, 1.0, 0);
+	yellowSphere.p = 100;
 
 	//reflective grey sphere
 	Shape greySphere = Sphere(glm::vec3(0, 1, -5), 0.4);
 	greySphere.color = grey;
+	greySphere.ks = glm::vec3(0.6f, 0.6f, 0.6f);
+	greySphere.ka = glm::vec3(0.6, 0.6, 0.6);
+	greySphere.p = 1000;
+	greySphere.Ia = 1.0f;
 
 	//metallic purple sphere
 	Shape purpleSphere = Sphere(glm::vec3(-0.8, -0.75, -4), 0.25);
 	purpleSphere.color = magenta;
+	purpleSphere.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	purpleSphere.ka = glm::vec3(1.0, 0, 1.0);
+	purpleSphere.p = 100;
+
 
 	//green cone
 	Shape cone1 = Triangle(glm::vec3(0, -1, -5.8), glm::vec3(0, 0.6, -5), glm::vec3(0.4, -1, -5.693));
@@ -188,17 +257,65 @@ void Program::init_scene2()
 	Shape cone11 = Triangle(glm::vec3(-0.6928, -1, -5.4), glm::vec3(0, 0.6, -5), glm::vec3(-0.4, -1, -5.693));
 	Shape cone12 = Triangle(glm::vec3(-0.4, -1, -5.693), glm::vec3(0, 0.6, -5), glm::vec3(0, -1, -5.8));
 	cone1.color = green;
+	cone1.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone1.ka = glm::vec3(0, 1.0, 0);
+	cone1.p = 100;
+
 	cone2.color = green;
+	cone2.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone2.ka = glm::vec3(0, 1.0, 0);
+	cone2.p = 100;
+
 	cone3.color = green;
+	cone3.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone3.ka = glm::vec3(0, 1.0, 0);
+	cone3.p = 100;
+
 	cone4.color = green;
+	cone4.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone4.ka = glm::vec3(0, 1.0, 0);
+	cone4.p = 100;
+
 	cone5.color = green;
+	cone5.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone5.ka = glm::vec3(0, 1.0, 0);
+	cone5.p = 100;
+
 	cone6.color = green;
+	cone6.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone6.ka = glm::vec3(0, 1.0, 0);
+	cone6.p = 100;
+
 	cone7.color = green;
+	cone7.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone7.ka = glm::vec3(0, 1.0, 0);
+	cone7.p = 100;
+
 	cone8.color = green;
+	cone8.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone8.ka = glm::vec3(0, 1.0, 0);
+	cone8.p = 100;
+
 	cone9.color = green;
+	cone9.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone9.ka = glm::vec3(0, 1.0, 0);
+	cone9.p = 100;
+
 	cone10.color = green;
+	cone10.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone10.ka = glm::vec3(0, 1.0, 0);
+	cone10.p = 100;
+
 	cone11.color = green;
+	cone11.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone11.ka = glm::vec3(0, 1.0, 0);
+	cone11.p = 100;
+
 	cone12.color = green;
+	cone12.ks = glm::vec3(1.0f, 1.0f, 1.0f);
+	cone12.ka = glm::vec3(0.0, 1.0, 0.0);
+	cone12.p = 100;
+
 
 	//shiny red isoahedron 
 	Shape isoahedrgon1 = Triangle(glm::vec3(-2, -1, -7), glm::vec3(-1.276, -0.4472, -6.474), glm::vec3(-2.276, -0.4472, -6.149));
@@ -248,6 +365,8 @@ void Program::init_scene2()
 						isoahedrgon16, isoahedrgon17 , isoahedrgon18 , isoahedrgon19 , isoahedrgon20,
 						cone1, cone2, cone3, cone4, cone5, cone6, cone7, cone8, cone9, cone10, cone11,
 						cone12, purpleSphere, greySphere, yellowSphere };
+						
+	//scene2_shapes = { purpleSphere, greySphere, yellowSphere };
 }
 
 void Program::init_scene3()
@@ -304,43 +423,59 @@ void Program::displayScene(int scene_number)
 			double v = b + (t - b)*(j + 0.5) / ny;
 			double d = 443.40500673; //calculated distance based on 60 degrees field of view
 
-			Ray ray = Ray(glm::vec3(0.0, 0.0, 0.0), glm::vec3(u, v, -d)); //shoot a ray
-			glm::normalize(ray.direction); //normalize
+			Ray ray = Ray(glm::vec3(0.0, 0.0, -0.25), glm::vec3(u, v, -d)); //shoot a ray
+			ray.direction = glm::normalize(ray.direction); //normalize
+
+			double time;
+			intersectionFound = false;
 
 			for (Shape s : shape_array)
 			{
-				intersectionFound = false;
-				double time = getRayShapeIntersection(ray, s); 
-				if (time < lowestTime)
+				time = getRayShapeIntersection(ray, s); 
+				if (time < lowestTime && time > 0)
 				{
 					lowestTime = time;
 					nearestObject = s;
 				}
+			}
 
-				if (intersectionFound)
-				{
-					glm::vec3 color = applyColor(ray, nearestObject, light);
-					image.SetPixel(i, j, color);
+			if (intersectionFound)
+			{
+				glm::vec3 color = applyColor(ray, nearestObject, light, lowestTime);
+				image.SetPixel(i, j, color);
 					
-					glm::vec3 intersectionP = multiplyVector(ray.direction, time);
-					glm::vec3 sDir = (light.position - intersectionP);
-					glm::normalize(sDir);
-					Ray sRay = Ray(intersectionP, sDir); 
+				glm::vec3 intersectionP = ray.origin + multiplyVector(ray.direction, lowestTime);
+				glm::vec3 sDir = (light.position - intersectionP);
+				//sDir = glm::normalize(sDir);
+				Ray sRay = Ray(intersectionP, sDir); 
 
-					intersectionFound = false;
+				intersectionFound = false;
 
-					for (Shape s : shape_array)
+				for (Shape s : shape_array)
+				{
+					//s.color *= reflectRay(0, ray, light, shape_array);
+					double ntime = getRayShapeIntersection(sRay, s);
+					if ((ntime > 0.0005) && (ntime < 1.0) && (intersectionFound))
 					{
-						double ntime = getRayShapeIntersection(sRay, s);
-						if ((ntime > 0.0001) && intersectionFound && (ntime < 0.9999))
-						{
-							glm::vec3 black = { 0.0, 0.0, 0.0 };
-							image.SetPixel(i, j, black);
-						}
-						intersectionFound = false;
+						//std::cout << ntime << std::endl;
+						//glm::vec3 ks = s.ks;
+						//glm::vec3 kd = s.color;
+						
+						//s.ks = glm::vec3(0.0, 0.0, 0.0);
+						//s.color = glm::vec3(0.0,0.0,0.0);
+
+						glm::vec3 shadowCol = applyShadow(ray, nearestObject, light);
+						//applyShadow(ray, s, light);
+						//glm::vec3(0,0,0);
+						// applyColor(ray, s, light);
+						image.SetPixel(i, j, shadowCol);
+
+						//s.ks = ks;
+						//s.color = kd;
 					}
 				}
 			}
+		
 		}
 	}
 	//Main render loop
@@ -349,6 +484,69 @@ void Program::displayScene(int scene_number)
 		image.Render();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+	}
+}
+
+glm::vec3 Program::reflectRay(double depth, Ray rayIn, Light lightIn, std::vector<Shape> shape_arrayIn)
+{
+	Light light = lightIn;
+	std::vector<Shape> shape_array = shape_arrayIn;
+	double rColor;
+
+	if (depth <= 1)
+	{
+		//ran per pixel
+		for (int i = 0; i < image.Width(); i++)
+		{
+			for (int j = 0; j < image.Height(); j++)
+			{
+				double lowestTime = 99999;
+				Shape nearestObject;
+
+				Ray ray = rayIn; //shoot a ray
+				ray.direction = glm::normalize(ray.direction); //normalize
+
+				//Ray rayR = ray.direction - 2(dotProduct(ray.direction, normal)*normal;
+
+				for (Shape s : shape_array)
+				{
+					intersectionFound = false;
+					double time = getRayShapeIntersection(ray, s); 
+					
+					if (time < lowestTime)
+					{
+						lowestTime = time;
+						nearestObject = s;
+					}
+
+					if (intersectionFound)
+					{
+						glm::vec3 rColor;// = applyColor(ray, nearestObject, light); //changed parameter
+						//image.SetPixel(i, j, rColor);
+					
+						glm::vec3 intersectionP = ray.origin + multiplyVector(ray.direction, time);
+						glm::vec3 sDir = (light.position - intersectionP);
+						Ray sRay = Ray(intersectionP, sDir); 
+
+						intersectionFound = false;
+
+						for (Shape s : shape_array)
+						{
+							double ntime = getRayShapeIntersection(sRay, s);
+							if ((ntime > 0.0005) && (ntime < 1.0) && (intersectionFound))
+							{
+								rColor *= 0;
+								//image.SetPixel(i, j, s.color);
+							}
+							intersectionFound = false;
+
+							rColor *= reflectRay(depth+1, ray, light, shape_array);
+						}
+					return rColor;
+					}
+				}
+			}
+		}	
 	}
 }
 
@@ -388,30 +586,38 @@ double Program::getRayPlaneIntersection(Ray ray, Shape plane)
 	*/
 	double t = 99999;
 
-	double numerator = dotProduct(subtractVector(plane.point, ray.origin), plane.normal); // (point - origin) . n
-	double denominator = dotProduct(ray.direction, plane.normal); // d . n
+	//double numerator = dotProduct(subtractVector(plane.point, ray.origin), plane.normal); // (point - origin) . n
+	//double denominator = dotProduct(ray.direction, plane.normal); // d . n
+
+	double numerator = glm::dot((plane.point - ray.origin), plane.normal);
+	double denominator = glm::dot(ray.direction, plane.normal);
+
 	// check for division by 0 error
 	if (denominator == 0) 
 	{
 		//set intersection flags, returns -1 if no intersection
-		intersectionFound = false;
+		//intersectionFound = false;
 		//planeIntersection = glm::vec3{ 0,0,0 };
 		return t;
 	}
 	// ((point - origin) . n) / (d . n)
+	//std::cout << numerator << std::endl;
+	//std::cout << denominator << std::endl;
 	t = numerator / denominator;
 	// check for positive t intersections, sets flags appropriately
 	if (t >= 0)
 	{
+
 		intersectionFound = true;
-		intersectionPoint = multiplyVector(ray.direction, t);
+		//intersectionPoint = ray.origin + multiplyVector(ray.direction, t);
 	}
 	else
 	{
-		intersectionFound = false;
+		//intersectionFound = false;
 		//planeIntersection = glm::vec3{ 0,0,0 };
 		t = 99999;
 	}
+	//std::cout << t << std::endl;
 	return t;
 }
 
@@ -436,7 +642,7 @@ double Program::getRaySphereIntersection(Ray ray, Shape sphere)
 		double t1 = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
 		double t2 = (-b - sqrt((b*b) - 4 * a*c)) / (2 * a);
 		double closerIntersectionPoint = glm::min(t1, t2);
-		intersectionPoint = multiplyVector(ray.direction, closerIntersectionPoint);
+		//intersectionPoint = ray.origin + multiplyVector(ray.direction, closerIntersectionPoint);
 		t = closerIntersectionPoint;
 	}
 	//when 0 there is 1 intersection
@@ -444,16 +650,17 @@ double Program::getRaySphereIntersection(Ray ray, Shape sphere)
 	{
 		intersectionFound = true;
 		double closerIntersectionPoint = (-b + sqrt((b*b) - 4 * a*c)) / (2 * a);
-		intersectionPoint = multiplyVector(ray.direction, closerIntersectionPoint);
+		//intersectionPoint = ray.origin + multiplyVector(ray.direction, closerIntersectionPoint);
 		t = closerIntersectionPoint;
 	}
 	//when negative there is no intersection
 	else
 	{
-		intersectionFound = false;
-		intersectionPoint = glm::vec3{ 0,0,0 };
+		//intersectionFound = false;
+		//intersectionPoint = glm::vec3{ 0,0,0 };
 		t = 99999;
 	}
+	//std::cout << t << std::endl;
 	return t;
 }
 
@@ -464,30 +671,27 @@ double Program::getRayTriangleIntersection(Ray ray, Shape triangle)
 
 	glm::vec3 planeNormal = crossProduct(x, y); //cross product
 
-	double n = getMagnitude(planeNormal);// ||N||
+	double n = glm::length(planeNormal); // ||N||
 
-	glm::vec3 normal = { planeNormal[0] / n, planeNormal[1] / n, planeNormal[2] / n }; // n = N / ||N||
+	glm::vec3 normal = glm::normalize(planeNormal); // n = N / ||N||
 
 	Plane tPlane = Plane(normal, triangle.p0);
 
-	double numerator = dotProduct(subtractVector(tPlane.point, ray.origin), tPlane.normal);
-	double denominator = dotProduct(ray.direction, tPlane.normal);
+	glm::vec3 temp = tPlane.point - ray.origin;
+	
+	double numerator = glm::dot(temp, tPlane.normal);
+	double denominator = glm::dot(ray.direction, tPlane.normal);
 
-	if (denominator == 0)
-	{
-		intersectionFound = false;
-		//planeIntersection = glm::vec3{ 0,0,0 };
-		return 99999;
-	}
+	
 
 	double t = numerator / denominator;
 
-	glm::vec3 pT = multiplyVector(ray.direction, t);;
+	glm::vec3 intersectionPoint = ray.origin + multiplyVector(ray.direction, t);
 
 	double area = n / 2.0;
 
-	glm::vec3 a1 = crossProduct(pT - triangle.p0, triangle.p2 - triangle.p0);
-	glm::vec3 a2 = crossProduct(pT - triangle.p0, triangle.p1 - triangle.p0);
+	glm::vec3 a1 = crossProduct(intersectionPoint - triangle.p0, triangle.p2 - triangle.p0);
+	glm::vec3 a2 = crossProduct(intersectionPoint - triangle.p0, triangle.p1 - triangle.p0);
 
 	double area1 = getMagnitude(a1)/2.0;
 	double area2 = getMagnitude(a2)/2.0;
@@ -498,32 +702,33 @@ double Program::getRayTriangleIntersection(Ray ray, Shape triangle)
 
 	if ((u >= 0.0 && u <= 1.0) && (v >= 0.0 && v <= 1.0) && (w >= 0.0 && w <= 1.0) && (t > 0.0) && ((u + v + w) <= 1.0) && ((u + v + w) >= 0.0))
 	{
-		if ((std::abs((w * triangle.p0.x + u * triangle.p1.x + v * triangle.p2.x) - pT.x) < 0.00001) &&
-			(std::abs((w * triangle.p0.y + u * triangle.p1.y + v * triangle.p2.y) - pT.y) < 0.00001) &&
-			(std::abs((w * triangle.p0.z + u * triangle.p1.z + v * triangle.p2.z) - pT.z) < 0.00001))
+		if ((std::abs((w * triangle.p0.x + u * triangle.p1.x + v * triangle.p2.x) - intersectionPoint.x) < 0.00001) &&
+			(std::abs((w * triangle.p0.y + u * triangle.p1.y + v * triangle.p2.y) - intersectionPoint.y) < 0.00001) &&
+			(std::abs((w * triangle.p0.z + u * triangle.p1.z + v * triangle.p2.z) - intersectionPoint.z) < 0.00001))
 		{
 			intersectionFound = true;
-			intersectionPoint = pT;
+			//intersectionPoint = intersectionPoint;
+			//std::cout << t << std::endl;
 			return t;
 		}
 		else 
 		{ 
-			intersectionFound = false;
-			intersectionPoint = glm::vec3{ 0,0,0 };
+			//intersectionFound = false;
+			//intersectionPoint = glm::vec3{ 0,0,0 };
 			return 99999;
 		}
 	}
 	else 
 	{
-		intersectionFound = false;
-		intersectionPoint = glm::vec3{ 0,0,0 };
+		//intersectionFound = false;
+		//intersectionPoint = glm::vec3{ 0,0,0 };
 		return 99999;
 	}
 }
 
 double Program::getRayShapeIntersection(Ray ray, Shape shape)
 {
-	double time = 99999;
+	double time = INFINITY;
 	if (shape.shapeID == 1)
 	{
 		time = getRaySphereIntersection(ray, shape);
@@ -536,35 +741,55 @@ double Program::getRayShapeIntersection(Ray ray, Shape shape)
 	{
 		time = getRayTriangleIntersection(ray, shape);
 	}
+	else
+	{
+		std::cout << "error" << std::endl;
+	}
 	return time;
 }
 
-glm::vec3 Program::applyColor(Ray ray, Shape shape, Light light)
+glm::vec3 Program::applyShadow(Ray ray, Shape shape, Light light)
+{
+	//Ia = ambient light color
+	float Ia = 0.8f;
+
+	//ka = ambient coefficient (default color)
+	glm::vec3 ka = shape.ka;
+
+	//ka * Ia
+	glm::vec3 ambient_component = ka * Ia;
+	
+	return ambient_component;
+}
+
+glm::vec3 Program::applyColor(Ray ray, Shape shape, Light light, double time)
 {
 	//I = intensity/color of the light source
-	glm::vec3 I = { 1,1,1 };
+	float I = 1.0f;
 
 	//kd = diffuse coefficient (surface color)
 	glm::vec3 kd = shape.color;
 
 	//Ia = ambient light color
-	glm::vec3 Ia = I;
+	float Ia = 1.0f;
 
 	//ka = ambient coefficient (default color)
-	glm::vec3 ka = kd;
+	glm::vec3 ka = shape.ka;
 
 	//ka * Ia
 	glm::vec3 ambient_component = ka * Ia;
 
+	glm::vec3 intersectionPoint = ray.origin + multiplyVector(ray.direction, time);
+
 	//l - light source position - intersection point
-	glm::vec3 l = intersectionPoint - light.position;
-	glm::normalize(l);
+	glm::vec3 l = light.position - intersectionPoint;
+	l = glm::normalize(l);
 
 	//calculation for the normal
 	glm::vec3 normal;
 	if (shape.shapeID == 1)
 	{
-		normal = -(intersectionPoint - shape.center);
+		normal = intersectionPoint - shape.center;
 	}
 	else if (shape.shapeID == 2)
 	{
@@ -572,38 +797,36 @@ glm::vec3 Program::applyColor(Ray ray, Shape shape, Light light)
 	}
 	else if (shape.shapeID == 3)
 	{
-		glm::vec3 x = subtractVector(shape.p1, shape.p0); //p1 - p0
-		glm::vec3 y = subtractVector(shape.p2, shape.p0); //p2 - p0
+		glm::vec3 x = shape.p1 - shape.p0; //p1 - p0
+		glm::vec3 y = shape.p2 - shape.p0; //p2 - p0
 
-		glm::vec3 planeNormal = crossProduct(x, y); //cross product
-
-		double n = getMagnitude(planeNormal);// ||N||
-
-		normal = { planeNormal[0] / n, planeNormal[1] / n, planeNormal[2] / n }; // n = N / ||N||
+		normal = glm::cross(x, y); //cross product
+	
 	}
-	glm::normalize(normal);
+	normal = glm::normalize(normal);
 
 	//get max of 0 and n . l
-	float max_diffuse = (dotProduct(normal, l) > 0.0001) ? dotProduct(normal, l) : 0;
+	float max_diffuse = (dotProduct(normal, l) > 0) ? dotProduct(normal, l) : 0;
+	//float max_diffuse = std::max(glm::dot(normal, l), 0);
 
 	//kd * I * max(0, normal . l))
 	glm::vec3 diffuse_component = max_diffuse * I * kd;
 
 	//choosing a specular color
-	float ks = 1.0f;
+	glm::vec3 ks = shape.ks;
 
 	//choosing a exponent
-	double p = 8; //p = Phong exponent
+	double p = shape.p; //p = Phong exponent
 
 	//calculations for v and h
-	glm::vec3 v = intersectionPoint - ray.origin;
-	glm::normalize(v);
+	glm::vec3 v = ray.origin - intersectionPoint;
+	v = glm::normalize(v);
 
 	//h = (v+l) / (||v+l||)
 	glm::vec3 h = (v + l) / glm::length(v + l);
 
 	//max of 0 and (normal . h)^p
-	float max_specular = pow(dotProduct(normal, h), p) > 0.0001 ? pow(dotProduct(normal, h), p) : 0;
+	float max_specular = pow(dotProduct(normal, h), p) > 0 ? pow(dotProduct(normal, h), p) : 0;
 
 	//ks * I * max(0, (normal . h)^p)
 	glm::vec3 specular_component = max_specular * ks * I;
@@ -611,6 +834,7 @@ glm::vec3 Program::applyColor(Ray ray, Shape shape, Light light)
 	//putting the whole thing together, diffuse + specular
 	//L = ka * Ia + kd * I * max(0, dot(normal, l)) + ks * I * max(0, pow(dot(normal, h), p));
 	glm::vec3 L = ambient_component + diffuse_component + specular_component;
+	//glm::vec3 L = ambient_component;
 
 	return L;
 }
