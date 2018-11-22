@@ -17,6 +17,7 @@ public:
 	glm::vec3 point;
 	glm::vec3 ks;
 	glm::vec3 ka;
+	glm::vec3 km;
 	float Ia;
 	double p;
 

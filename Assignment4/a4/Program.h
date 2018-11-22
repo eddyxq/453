@@ -33,7 +33,7 @@ public:
 
 	void displayScene(int scene_number);
 
-	glm::vec3 reflectRay(double depth, Ray rayIn, Light lightIn, std::vector<Shape> shape_arrayIn);
+	glm::vec3 reflectRay(double depth, Ray rayIn, Light lightIn, glm::vec3 km, std::vector<Shape> shape_arrayIn, glm::vec3 normal, glm::vec3 intersectionPoint);
 
 	double getMagnitude(glm::vec3 a);
 	double dotProduct(glm::vec3 a, glm::vec3 b);
